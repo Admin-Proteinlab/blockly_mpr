@@ -28,7 +28,11 @@ function createWindow() {
     height: 700,
     icon: iconPath,
     frame: false,
-    movable: true
+    movable: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
   });
 
   const urlParam = process.platform === 'win32' && process.argv.length >= 2
