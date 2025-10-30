@@ -122,23 +122,67 @@ if (servoNumber == 3){
 }
 }
 
-void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle=1){
+// void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle=1){
 
+//   for (int i=0; i<4; i++) {
+//     servo[i].SetO(O[i]);
+//     servo[i].SetA(A[i]);
+//     servo[i].SetT(T);
+//     servo[i].SetPh(phase_diff[i]);
+//   }
+//   double ref=millis();
+//    for (double x=ref; x<=T*cycle+ref; x=millis()){
+//      for (int i=0; i<4; i++){
+//         servo[i].refresh();
+//         //delayMicroseconds(100);
+//         Serial.println("Otto_cpp_oscillateServo!_delay");
+//      }
+//   }
+// }
+
+void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle=1.0){
+  // 1) Configurar osciladores
   for (int i=0; i<4; i++) {
     servo[i].SetO(O[i]);
     servo[i].SetA(A[i]);
     servo[i].SetT(T);
     servo[i].SetPh(phase_diff[i]);
   }
-  double ref=millis();
-   for (double x=ref; x<=T*cycle+ref; x=millis()){
-     for (int i=0; i<4; i++){
+
+  // 2) Temporización a ~50 Hz (20 ms)
+  const uint16_t FRAME_MS = 20;           // Cadencia servo típica
+  const uint16_t DBG_EVERY = 5;           // Imprime cada 5 frames (≈10 Hz)
+  unsigned long ref      = millis();
+  unsigned long end_time = ref + (unsigned long)(T * cycle);
+  unsigned long nextTick = ref; 
+  uint32_t frameCount    = 0;
+
+  // 3) Bucle con esperas discretas, no busy-spin
+  while ( (long)(millis() - end_time) < 0 ) {
+    unsigned long now = millis();
+    if ((long)(now - nextTick) >= 0) {
+      // Actualizamos solo a 50 Hz
+      for (int i=0; i<4; i++){
         servo[i].refresh();
-        delayMicroseconds(100);
-        Serial.println("Otto_cpp_oscillateServo!_delay");
-     }
+      }
+
+      if ((frameCount % DBG_EVERY) == 0) {
+        Serial.println(F("Otto_cpp_oscillateServo frame"));
+      }
+      frameCount++;
+      nextTick += FRAME_MS;
+    }
+
+    // Cede CPU hasta el siguiente frame (ahorra energía)
+    // Si usas sleep idle en loop(), esto permite que el micro duerma:
+    delay(1); // ~1ms es suficiente para no saturar
   }
+
+  // 4) Opción: al terminar, si A[] son todos 0 o estamos cerca de home, detach
+  // (deadband ~1–2°; aquí solo esbozo)
+  // for(int i=0;i<4;i++){ /* si estable -> servo[i].detach(); */ }
 }
+
 
 void Otto::_execute(int A[4], int O[4], int T, double phase_diff[4], float steps = 1.0){
 
