@@ -46,7 +46,7 @@ void Oscillator::attach(int pin, bool rev)
 
       //-- Initialization of oscilaltor parameters
       _samplingPeriod=30;
-      _period=2000;
+      _period=3000; //original:2000
       _numberSamples = _period/_samplingPeriod;
       _inc = 2*M_PI/_numberSamples;
 
@@ -90,11 +90,39 @@ void Oscillator::SetT(unsigned int T)
 /*******************************/
 /* Manual set of the position  */
 /******************************/
+// version original
+// void Oscillator::SetPosition(int position)
+// {
+//   _servo.write(position+_trim);
+//   delayMicroseconds(25000);
+//   Serial.println("osc_cpp_SetPosition_delay!");
+// };
+//
+// version suavizada
+// Se incrementa o decrementa gradualmente la posición del servo
 
-void Oscillator::SetPosition(int position)
-{
-  _servo.write(position+_trim);
-};
+void Oscillator::SetPosition(int position) {
+    int currentAngle = _servo.read();         // Lee ángulo actual (último comando enviado)
+    int targetAngle = position + _trim;       // Calcula ángulo objetivo con trim
+
+    if (currentAngle < targetAngle) {
+        // Incrementar gradualmente hacia el objetivo
+        for (int angle = currentAngle; angle <= targetAngle; ++angle) {
+            _servo.write(angle);             // Mueve al siguiente ángulo
+            delayMicroseconds(2000);                       // Pequeña pausa (20 ms) controla la velocidad
+        }
+    } else if (currentAngle > targetAngle) {
+        // Decrementar gradualmente hacia el objetivo
+        for (int angle = currentAngle; angle >= targetAngle; --angle) {
+            _servo.write(angle);
+            delayMicroseconds(2000);
+        }
+    }
+    // Si currentAngle == targetAngle, no hace nada (ya está en posición)
+
+    Serial.println("osc_cpp_SetPosition_delay!");
+}
+
 
 
 /*******************************************************************/
