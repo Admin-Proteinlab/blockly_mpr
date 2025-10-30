@@ -5,7 +5,7 @@
   #include <pins_arduino.h>
 #endif
 #include "Otto.h"
-#include <Oscillator.h>
+#include "Oscillator.h"
 
 void Otto::init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer) {
 
@@ -134,6 +134,8 @@ void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], floa
    for (double x=ref; x<=T*cycle+ref; x=millis()){
      for (int i=0; i<4; i++){
         servo[i].refresh();
+        delayMicroseconds(100);
+        Serial.println("Otto_cpp_oscillateServo!_delay");
      }
   }
 }
@@ -163,10 +165,9 @@ void Otto::_execute(int A[4], int O[4], int T, double phase_diff[4], float steps
 void Otto::home(){
 
   if(isOttoResting==false){ //Go to rest position only if necessary
-
     int homes[4]={90, 90, 90, 90}; //All the servos at rest position
-    _moveServos(500,homes);   //Move the servos in half a second
-
+    //_moveServos(500,homes); //Move the servos in half a second
+    _moveServos(1000,homes);  //Move the servos in a second to be more gentle with the servos 
     detachServos();
     isOttoResting=true;
   }
