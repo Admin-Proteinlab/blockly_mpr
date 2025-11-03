@@ -5,6 +5,7 @@
 //-- (c) Juan Gonzalez-Gomez (Obijuan), Dec 2011
 //-- GPL license
 //--------------------------------------------------------------
+
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
 #else
@@ -42,6 +43,9 @@ void Oscillator::attach(int pin, bool rev) {
     _servo.attach(pin);
     _servo.write(90);
 
+    // corrección sugerida: guardar el pin 
+    _pin = pin;
+
     //-- Initialization of oscilaltor parameters
     _samplingPeriod = 30;
     _period = 3000;  //original:2000
@@ -59,6 +63,11 @@ void Oscillator::attach(int pin, bool rev) {
 
     //-- Reverse mode
     _rev = rev;
+
+    // -- corrección sugerida: inicializar variables de control
+    _lastCmd = 90;
+    _lastMotion = millis();
+    _lastUpdate = millis();
   }
 }
 
@@ -85,34 +94,79 @@ void Oscillator::SetT(unsigned int T) {
 /* Manual set of the position  */
 /******************************/
 
-// void Oscillator::SetPosition(int position)
-// {
-//   _servo.write(position+_trim);
-//   delayMicroseconds(25000);
-//   Serial.println("osc_cpp_SetPosition_delay!");
-// };
+// version 1 de adaptar posición
+// void Oscillator::SetPosition(int position) {
+//   _osc_cpp_SetPosition_delay = 1200;  //con 5000 la diferencia de movimiento entre posicion es muy notoria, recomendado: 1000
+//   int currentAngle = _servo.read();    // Lee ángulo actual (último comando enviado)
+//   int targetAngle = position + _trim;  // Calcula ángulo objetivo con trim
+
+//   if (currentAngle < targetAngle) {
+//     // Incrementar gradualmente hacia el objetivo
+//     for (int angle = currentAngle; angle <= targetAngle; ++angle) {
+//       _servo.write(angle);      // Mueve al siguiente ángulo
+//       delayMicroseconds(_osc_cpp_SetPosition_delay);  // Pequeña pausa controla la velocidad
+//     }
+//   } else if (currentAngle > targetAngle) {
+//     // Decrementar gradualmente hacia el objetivo
+//     for (int angle = currentAngle; angle >= targetAngle; --angle) {
+//       _servo.write(angle);
+//       delayMicroseconds(_osc_cpp_SetPosition_delay);
+//     }
+//   }
+//   // Si currentAngle == targetAngle, no hace nada (ya está en posición)
+
+//   Serial.print("osc_cpp_SetPosition_delay!, ");Serial.println(_osc_cpp_SetPosition_delay);
+// }
+// fin version 1
+
+// Versión previa (bloqueante) comentada en tu código original
 
 void Oscillator::SetPosition(int position) {
-  int currentAngle = _servo.read();    // Lee ángulo actual (último comando enviado)
-  int targetAngle = position + _trim;  // Calcula ángulo objetivo con trim
+  // --- NO BLOQUEANTE + rate limit + anti-spam + auto-detach ---
+  unsigned long now = millis();
 
-  if (currentAngle < targetAngle) {
-    // Incrementar gradualmente hacia el objetivo
-    for (int angle = currentAngle; angle <= targetAngle; ++angle) {
-      _servo.write(angle);      // Mueve al siguiente ángulo
-      delayMicroseconds(2000);  // Pequeña pausa (20 ms) controla la velocidad
+  // 1) Limitar a 50 Hz por servo
+  if ((uint32_t)(now - _lastUpdate) < SERVO_FRAME_MS) return;
+
+  // 2) Calcular comando con trim (coherente con tu SetPosition original)
+  int cmd = position + _trim;
+
+  // correccion sugerida:
+  cmd = constrain(cmd, 0, 180);
+
+
+
+  // Si deseas considerar inversión aquí, descomenta:
+  // if (_rev) cmd = 180 - cmd;
+
+  // 3) Evitar escrituras redundantes (tolerancia 1°)
+  if (_lastCmd != 255 && abs(cmd - (int)_lastCmd) <= 1) {
+    // Sin cambio real: evaluar auto-detach
+    if (_servo.attached() && (uint32_t)(now - _lastMotion) > IDLE_DETACH_MS) {
+      _servo.detach();
     }
-  } else if (currentAngle > targetAngle) {
-    // Decrementar gradualmente hacia el objetivo
-    for (int angle = currentAngle; angle >= targetAngle; --angle) {
-      _servo.write(angle);
-      delayMicroseconds(2000);
-    }
+    _lastUpdate = now;
+    return;
   }
-  // Si currentAngle == targetAngle, no hace nada (ya está en posición)
 
-  Serial.println("osc_cpp_SetPosition_delay!");
+  // 4) Asegurar attach solo cuando hay que mover
+  if (!_servo.attached() && _pin >= 0) {
+    _servo.attach(_pin);
+  }
+
+  // 5) Escritura directa (la rampa temporal la hace el nivel superior si aplica)
+  _servo.write(cmd);
+  _lastCmd = (uint8_t)cmd;
+  _lastMotion = now;
+  _lastUpdate = now;
+
+  // (Si quieres conservar tu debug de delay, puedes imprimir el valor actual,
+  // aunque ya no se usa para bloquear)
+  // Serial.print("osc_cpp_SetPosition_delay!: ");
+  // Serial.println(_osc_cpp_SetPosition_delay);
 }
+
+
 
 
 
@@ -122,21 +176,47 @@ void Oscillator::SetPosition(int position) {
 /* if another sample should be taken and position the servo if so  */
 /*******************************************************************/
 void Oscillator::refresh() {
-
-  //-- Only When TS milliseconds have passed, the new sample is obtained
+  //-- Only when TS milliseconds have passed, the new sample is obtained
   if (next_sample()) {
-
     //-- If the oscillator is not stopped, calculate the servo position
     if (!_stop) {
       //-- Sample the sine function and set the servo pos
       _pos = round(_amplitude * sin(_phase + _phase0) + _offset);
       if (_rev) _pos = -_pos;
-      _servo.write(_pos + 90 + _trim);
+      
+      //-- CORREGIDO: Aplicar límites y validar
+      int servoPos = constrain(_pos + 90 + _trim, 0, 180);
+      
+      //-- CORREGIDO: Coherencia con anti-spam/auto-detach
+      unsigned long now = millis();
+      
+      // Rate limit check
+      if ((uint32_t)(now - _lastUpdate) >= SERVO_FRAME_MS) {
+        // Anti-spam: solo escribir si hay cambio significativo
+        if (_lastCmd == 255 || abs(servoPos - (int)_lastCmd) > 1) {
+          // Re-attach si es necesario
+          if (!_servo.attached() && _pin >= 0) {
+            _servo.attach(_pin);
+          }
+          
+          _servo.write(servoPos);
+          _lastCmd = (uint8_t)servoPos;
+          _lastMotion = now;
+        }
+        _lastUpdate = now;
+      }
+    } else {
+      // CORREGIDO: Auto-detach cuando está detenido por mucho tiempo
+      unsigned long now = millis();
+      if (_servo.attached() && (uint32_t)(now - _lastMotion) > IDLE_DETACH_MS) {
+        _servo.detach();
+      }
     }
-
+    
     //-- Increment the phase
-    //-- It is always increased, even when the oscillator is stop
+    //-- It is always increased, even when the oscillator is stopped
     //-- so that the coordination is always kept
-    _phase = _phase + _inc;
+    // CORREGIDO: Normalizar fase para evitar overflow
+    _phase = fmod(_phase + _inc, 2 * M_PI);
   }
 }

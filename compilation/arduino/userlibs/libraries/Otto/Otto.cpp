@@ -122,25 +122,34 @@ if (servoNumber == 3){
 }
 }
 
-// void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle=1){
+bool Otto::oscillateServosStep(int A[4], int O[4], int T, double phase_diff[4], float cycle){
+  if (!osc.active){
+    attachServos();
+    if(getRestState()==true){
+      setRestState(false);
+    }
+    for (int i=0; i<4; i++){
+      osc.A_cur[i] = A[i];
+      osc.O_cur[i] = O[i];
+    }
+    oscApplyTargets_(A,O,T,phase_diff,cycle);
 
-//   for (int i=0; i<4; i++) {
-//     servo[i].SetO(O[i]);
-//     servo[i].SetA(A[i]);
-//     servo[i].SetT(T);
-//     servo[i].SetPh(phase_diff[i]);
-//   }
-//   double ref=millis();
-//    for (double x=ref; x<=T*cycle+ref; x=millis()){
-//      for (int i=0; i<4; i++){
-//         servo[i].refresh();
-//         //delayMicroseconds(100);
-//         Serial.println("Otto_cpp_oscillateServo!_delay");
-//      }
-//   }
-// }
+    unsigned long now = millis();
+    osc.ref_ms         = now;
+    osc.end_ms         = now + (unsigned long)((float)T * cycle);
+    osc.next_ms        = now;
+    osc.frames         = 0;
+    osc.last_motion_ms = now;
+    osc.active         = true;
+  } else {
+    // Permite cambiar objetivos en caliente (seguirá rampando)
+    oscApplyTargets_(A,O,T,phase_diff,cycle);
+  }
 
-void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle=1.0){
+  return oscStep_();
+}
+
+void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle){
   // 1) Configurar osciladores
   for (int i=0; i<4; i++) {
     servo[i].SetO(O[i]);
@@ -150,8 +159,8 @@ void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], floa
   }
 
   // 2) Temporización a ~50 Hz (20 ms)
-  const uint16_t FRAME_MS = 20;           // Cadencia servo típica
-  const uint16_t DBG_EVERY = 5;           // Imprime cada 5 frames (≈10 Hz)
+  const uint16_t FRAME_MS = 1;           // Cadencia servo típica
+  const uint16_t DBG_EVERY = 10;           // Imprime cada 5 frames (≈10 Hz)
   unsigned long ref      = millis();
   unsigned long end_time = ref + (unsigned long)(T * cycle);
   unsigned long nextTick = ref; 
@@ -180,11 +189,11 @@ void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], floa
 
   // 4) Opción: al terminar, si A[] son todos 0 o estamos cerca de home, detach
   // (deadband ~1–2°; aquí solo esbozo)
-  // for(int i=0;i<4;i++){ /* si estable -> servo[i].detach(); */ }
+  // for(int i=0;i<4;i++){ // si estable -> servo[i].detach();  }
 }
 
 
-void Otto::_execute(int A[4], int O[4], int T, double phase_diff[4], float steps = 1.0){
+void Otto::_execute(int A[4], int O[4], int T, double phase_diff[4], float steps){
 
   attachServos();
   if(getRestState()==true){
@@ -211,7 +220,7 @@ void Otto::home(){
   if(isOttoResting==false){ //Go to rest position only if necessary
     int homes[4]={90, 90, 90, 90}; //All the servos at rest position
     //_moveServos(500,homes); //Move the servos in half a second
-    _moveServos(1000,homes);  //Move the servos in a second to be more gentle with the servos 
+    _moveServos(800,homes);  //Move the servos in a second to be more gentle with the servos 
     detachServos();
     isOttoResting=true;
   }
@@ -225,6 +234,99 @@ void Otto::setRestState(bool state){
 
     isOttoResting = state;
 }
+
+///////////////////////////////////////////////////////////////////
+//-- OSCILLATOR: energy-optimized runner (helpers & step) --------//
+///////////////////////////////////////////////////////////////////
+void Otto::oscApplyTargets_(const int A[4], const int O[4], int T, const double Ph[4], float cycles){
+  for (int i=0; i<4; i++){
+    osc.A_tgt[i] = A[i];
+    osc.O_tgt[i] = O[i];
+    osc.Ph[i]    = Ph[i];
+  }
+  osc.T_ms   = T;
+  osc.cycles = cycles;
+
+  for (int i=0; i<4; i++){
+    servo[i].SetA(osc.A_cur[i]);
+    servo[i].SetO(osc.O_cur[i]);
+    servo[i].SetT(osc.T_ms);
+    servo[i].SetPh(osc.Ph[i]);
+  }
+}
+
+bool Otto::oscAllAZero_() const {
+  for (int i=0; i<4; i++){
+    if (osc.A_cur[i] != 0 || osc.A_tgt[i] != 0) return false;
+  }
+  return true;
+}
+
+void Otto::oscRampAO_(){
+  for (int i=0; i<4; i++){
+    int dA = osc.A_tgt[i] - osc.A_cur[i];
+    if      (dA >  OTTO_SLEW_MAX_DEG_FRAME) osc.A_cur[i] += OTTO_SLEW_MAX_DEG_FRAME;
+    else if (dA < -OTTO_SLEW_MAX_DEG_FRAME) osc.A_cur[i] -= OTTO_SLEW_MAX_DEG_FRAME;
+    else                                     osc.A_cur[i]  = osc.A_tgt[i];
+
+    int dO = osc.O_tgt[i] - osc.O_cur[i];
+    if      (dO >  OTTO_SLEW_MAX_DEG_FRAME) osc.O_cur[i] += OTTO_SLEW_MAX_DEG_FRAME;
+    else if (dO < -OTTO_SLEW_MAX_DEG_FRAME) osc.O_cur[i] -= OTTO_SLEW_MAX_DEG_FRAME;
+    else                                     osc.O_cur[i]  = osc.O_tgt[i];
+
+    servo[i].SetA(osc.A_cur[i]);
+    servo[i].SetO(osc.O_cur[i]);
+  }
+}
+
+bool Otto::oscIsMoving_() const {
+  return !oscAllAZero_();
+}
+
+// === Paso de frame con temporizacion y throttle ===
+bool Otto::oscStep_(){
+  if (!osc.active) return false;
+
+  unsigned long now = millis();
+
+  if ((long)(now - osc.end_ms) >= 0){
+    if (oscAllAZero_()){
+      detachServos();
+    }
+    osc.active = false;
+    return false;
+  }
+
+  if ((long)(now - osc.next_ms) >= 0){
+    oscRampAO_();
+
+    for (int i=0; i<4; i++){
+      servo[i].refresh();
+    }
+
+#if OTTO_DEBUG_OSC
+    if ((osc.frames % OTTO_DBG_EVERY_N_FRAMES) == 0){
+      OTTO_OSC_DBG("Otto_cpp_oscillateServo frame");
+    }
+#endif
+
+    if (oscIsMoving_()){
+      osc.last_motion_ms = now;
+    } else {
+      if ((long)(now - osc.last_motion_ms) >= (long)OTTO_IDLE_MS_DETACH){
+        detachServos();
+      }
+    }
+
+    osc.frames++;
+    osc.next_ms += OTTO_FRAME_MS;
+  }
+
+  return true;
+}
+
+
+
 
 ///////////////////////////////////////////////////////////////////
 //-- PREDETERMINED MOTION SEQUENCES -----------------------------//

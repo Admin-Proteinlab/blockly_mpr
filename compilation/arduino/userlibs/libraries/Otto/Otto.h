@@ -1,6 +1,15 @@
 #ifndef Otto_h
 #define Otto_h
 
+// === DEBUG OSCILLATOR ===
+// 1 = imprime cada N frames, 0 = silencia
+#define OTTO_DEBUG_OSC 1
+#if OTTO_DEBUG_OSC
+#define OTTO_OSC_DBG(msg) Serial.println(F(msg))
+#else
+#define OTTO_OSC_DBG(msg)
+#endif
+
 #ifdef ARDUINO_ARCH_ESP32
 #include <ESP32Servo.h>
 #else
@@ -22,6 +31,39 @@
 #define MEDIUM 15
 #define BIG 30
 
+// === Parámetros de oscilación y ahorro ===
+static const uint16_t OTTO_FRAME_MS = 20;           // ~50 Hz
+static const uint16_t OTTO_DBG_EVERY_N_FRAMES = 5;  // imprime cada 5 frames
+static const uint8_t OTTO_SLEW_MAX_DEG_FRAME = 5;   // Δmáx de A/O por frame
+static const uint8_t OTTO_DEADBAND_DEG = 2;         // reservado (si luego mides Δθ real)
+static const uint16_t OTTO_IDLE_MS_DETACH = 200;    // ms quieto antes de detach
+
+// === OscState para habilitar proceso no-bloqueante
+struct OscState {
+  bool active = false;
+
+  // Objetivo:
+  int A_tgt[4] = { 0, 0, 0, 0 };
+  int O_tgt[4] = { 0, 0, 0, 0 };
+  int T_ms = 1000;
+  double Ph[4] = { 0, 0, 0, 0 };
+  float cycles = 1.0;
+
+  // Estado actual (rampa de A/O):
+  int A_cur[4] = { 0, 0, 0, 0 };
+  int O_cur[4] = { 0, 0, 0, 0 };
+
+  // Timing:
+  unsigned long ref_ms = 0;
+  unsigned long end_ms = 0;
+  unsigned long next_ms = 0;
+  uint32_t frames = 0;
+
+  // Inactividad (para detach):
+  unsigned long last_motion_ms = 0;
+};
+// === fin preparación OscState
+
 class Otto {
 public:
 
@@ -38,7 +80,7 @@ public:
   //-- Predetermined Motion Functions
   void _moveServos(int time, int servo_target[]);
   void _moveSingle(int position, int servo_number);
-  void oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle);
+  //  void oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle); //se reemplazará al final, para connotar el cambio
 
   //-- HOME = Otto at rest position
   void home();
@@ -79,7 +121,25 @@ public:
   void matrixIntensity(int intensity);
   void setLed(byte X, byte Y, byte value);
   void writeText(const char* s, byte scrollspeed);
+
+  // === inclusión de etapa no bloqueante
+  // Nueva API no-bloqueante (opcional):
+  bool oscillateServosStep(int A[4], int O[4], int T, double phase_diff[4], float cycle = 1.0f);
+
+  // La API original se mantiene:
+  void oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle = 1.0f);
+
+
 private:
+  // === para activar OscState ===
+
+  OscState osc;
+
+  void oscApplyTargets_(const int A[4], const int O[4], int T, const double Ph[4], float cycles);
+  bool oscStep_();            // ejecuta un frame si corresponde; true = sigue activo
+  bool oscAllAZero_() const;  // todos A en cero (cur y tgt)
+  void oscRampAO_();          // rampa (slew-rate) A_cur/O_cur -> A_tgt/O_tgt
+  bool oscIsMoving_() const;  // placeholder; útil si luego calculas Δθ real
 
   Oscillator servo[4];
   Otto_Matrix ledmatrix;
