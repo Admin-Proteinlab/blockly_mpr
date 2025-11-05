@@ -37,7 +37,7 @@
         <statement name="DO0">
           <block type="otto_move" id="=hv@XBz7rNA%~He*OF22">
             <field name="otto_move_sens">BACKWARD</field>
-            <field name="otto_move_speed">1000</field>
+            <field name="otto_move_speed">2000</field>
           </block>
         </statement>
       </block>
