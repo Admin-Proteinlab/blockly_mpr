@@ -6,10 +6,10 @@
 //-- GPL license
 //--------------------------------------------------------------
 #if defined(ARDUINO) && ARDUINO >= 100
-  #include "Arduino.h"
+#include "Arduino.h"
 #else
-  #include "WProgram.h"
-  #include <pins_arduino.h>
+#include "WProgram.h"
+#include <pins_arduino.h>
 #endif
 #include "Oscillator.h"
 
@@ -18,17 +18,18 @@
 //-- the last sample was taken
 bool Oscillator::next_sample()
 {
-  
+
   //-- Read current time
   _currentMillis = millis();
- 
+
   //-- Check if the timeout has passed
-  if(_currentMillis - _previousMillis > _samplingPeriod) {
-    _previousMillis = _currentMillis;   
+  if (_currentMillis - _previousMillis > _samplingPeriod)
+  {
+    _previousMillis = _currentMillis;
 
     return true;
   }
-  
+
   return false;
 }
 
@@ -38,40 +39,39 @@ bool Oscillator::next_sample()
 void Oscillator::attach(int pin, bool rev)
 {
   //-- If the oscillator is detached, attach it.
-  if(!_servo.attached()){
+  if (!_servo.attached())
+  {
 
     //-- Attach the servo and move it to the home position
-      _servo.attach(pin);
-      _servo.write(90);
+    _servo.attach(pin);
+    //_servo.write(90);
 
-      //-- Initialization of oscilaltor parameters
-      _samplingPeriod=30;
-      _period=2000;
-      _numberSamples = _period/_samplingPeriod;
-      _inc = 2*M_PI/_numberSamples;
+    //-- Initialization of oscilaltor parameters
+    _samplingPeriod = 20;
+    _period = 2000; // original:2000
+    _numberSamples = _period / _samplingPeriod;
+    _inc = 2 * M_PI / _numberSamples;
 
-      _previousMillis=0;
+    _previousMillis = 0;
 
-      //-- Default parameters
-      _amplitude=45;
-      _phase=0;
-      _phase0=0;
-      _offset=0;
-      _stop=false;
+    //-- Default parameters
+    _amplitude = 45;
+    _phase = 0;
+    _phase0 = 0;
+    _offset = 0;
+    _stop = false;
 
-      //-- Reverse mode
-      _rev = rev;
+    //-- Reverse mode
+    _rev = rev;
   }
-      
 }
 
 //-- Detach an oscillator from his servo
 void Oscillator::detach()
 {
-   //-- If the oscillator is attached, detach it.
-  if(_servo.attached())
-        _servo.detach();
-
+  //-- If the oscillator is attached, detach it.
+  if (_servo.attached())
+    _servo.detach();
 }
 
 /*************************************/
@@ -80,22 +80,51 @@ void Oscillator::detach()
 void Oscillator::SetT(unsigned int T)
 {
   //-- Assign the new period
-  _period=T;
-  
+  _period = T;
+
   //-- Recalculate the parameters
-  _numberSamples = _period/_samplingPeriod;
-  _inc = 2*M_PI/_numberSamples;
+  _numberSamples = _period / _samplingPeriod;
+  _inc = 2 * M_PI / _numberSamples;
 };
 
 /*******************************/
 /* Manual set of the position  */
 /******************************/
 
+// void Oscillator::SetPosition(int position)
+// {
+//   _servo.write(position+_trim);
+//   delayMicroseconds(25000);
+//   Serial.println("osc_cpp_SetPosition_delay!");
+// };
+
 void Oscillator::SetPosition(int position)
 {
-  _servo.write(position+_trim);
-};
+  int currentAngle = _servo.read();   // Lee ángulo actual (último comando enviado)
+  int targetAngle = position + _trim; // Calcula ángulo objetivo con trim
 
+  if (currentAngle < targetAngle)
+  {
+    // Incrementar gradualmente hacia el objetivo
+    for (int angle = currentAngle; angle <= targetAngle; ++angle)
+    {
+      _servo.write(angle);     // Mueve al siguiente ángulo
+      delayMicroseconds(5000); // Pequeña pausa (5ms) controla la velocidad
+    }
+  }
+  else if (currentAngle > targetAngle)
+  {
+    // Decrementar gradualmente hacia el objetivo
+    for (int angle = currentAngle; angle >= targetAngle; --angle)
+    {
+      _servo.write(angle);
+      delayMicroseconds(5000);
+    }
+  }
+  // Si currentAngle == targetAngle, no hace nada (ya está en posición)
+
+  Serial.println("osc_cpp_SetPosition_delay!");
+}
 
 /*******************************************************************/
 /* This function should be periodically called                     */
@@ -104,22 +133,24 @@ void Oscillator::SetPosition(int position)
 /*******************************************************************/
 void Oscillator::refresh()
 {
-  
+
   //-- Only When TS milliseconds have passed, the new sample is obtained
-  if (next_sample()) {
-  
-      //-- If the oscillator is not stopped, calculate the servo position
-      if (!_stop) {
-        //-- Sample the sine function and set the servo pos
-         _pos = round(_amplitude * sin(_phase + _phase0) + _offset);
-	       if (_rev) _pos=-_pos;
-         _servo.write(_pos+90+_trim);
-      }
+  if (next_sample())
+  {
 
-      //-- Increment the phase
-      //-- It is always increased, even when the oscillator is stop
-      //-- so that the coordination is always kept
-      _phase = _phase + _inc;
+    //-- If the oscillator is not stopped, calculate the servo position
+    if (!_stop)
+    {
+      //-- Sample the sine function and set the servo pos
+      _pos = round(_amplitude * sin(_phase + _phase0) + _offset);
+      if (_rev)
+        _pos = -_pos;
+      _servo.write(_pos + 90 + _trim);
+    }
 
+    //-- Increment the phase
+    //-- It is always increased, even when the oscillator is stop
+    //-- so that the coordination is always kept
+    _phase = _phase + _inc;
   }
 }
