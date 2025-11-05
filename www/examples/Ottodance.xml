@@ -20,11 +20,11 @@
         <statement name="DO">
           <block type="otto_move" id="@^_?Uwmg}Z~OYB1WH)Xz">
             <field name="otto_move_sens">FORWARD</field>
-            <field name="otto_move_speed">1000</field>
+            <field name="otto_move_speed">2000</field>
             <next>
               <block type="otto_move" id=";lQ(H_F|uFx+Z.dVRnNA">
                 <field name="otto_move_sens">BACKWARD</field>
-                <field name="otto_move_speed">1000</field>
+                <field name="otto_move_speed">2000</field>
               </block>
             </next>
           </block>
@@ -39,7 +39,7 @@
             <statement name="DO">
               <block type="otto_dance" id="k+`QGv6vqy-aZ=x_b2$d">
                 <field name="otto_dance_movement">moonwalkerLEFT</field>
-                <field name="otto_move_speed">1000</field>
+                <field name="otto_move_speed">2000</field>
                 <field name="otto_dance_size">25</field>
               </block>
             </statement>
@@ -53,7 +53,7 @@
                 <statement name="DO">
                   <block type="otto_dance" id="6%+k`.v-TUo3SFaz/ni%">
                     <field name="otto_dance_movement">moonwalkerRIGHT</field>
-                    <field name="otto_move_speed">1000</field>
+                    <field name="otto_move_speed">2000</field>
                     <field name="otto_dance_size">25</field>
                   </block>
                 </statement>
@@ -67,12 +67,12 @@
                     <statement name="DO">
                       <block type="otto_do" id="ZGh[;zw4i_dD?/`g[J;v">
                         <field name="otto_do_movement">swing</field>
-                        <field name="otto_move_speed">1000</field>
+                        <field name="otto_move_speed">2000</field>
                         <field name="otto_dance_size">25</field>
                         <next>
                           <block type="otto_do" id="h:$4@@PR]kW.IZSjnDdz">
                             <field name="otto_do_movement">jitter</field>
-                            <field name="otto_move_speed">1000</field>
+                            <field name="otto_move_speed">2000</field>
                             <field name="otto_dance_size">25</field>
                           </block>
                         </next>
