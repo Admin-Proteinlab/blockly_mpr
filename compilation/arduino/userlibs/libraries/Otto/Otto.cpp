@@ -25,7 +25,11 @@ void Otto::init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzze
     }
   }
 
-  for (int i = 0; i < 4; i++) servo_position[i] = 90;
+  for (int i = 0; i < 4; i++){
+    servo_position[i] = 90;
+
+
+  }; 
 
   //Buzzer pin:
   pinBuzzer = Buzzer;
@@ -165,7 +169,7 @@ void Otto::home(){
   if(isOttoResting==false){ //Go to rest position only if necessary
 
     int homes[4]={90, 90, 90, 90}; //All the servos at rest position
-    _moveServos(500,homes);   //Move the servos in half a second
+    _moveServos(2000,homes);   //Move the servos in half a second, default:500,new:2000
 
     detachServos();
     isOttoResting=true;

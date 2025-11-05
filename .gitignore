@@ -16,3 +16,5 @@
 /compilation/arduino/inventory.yaml
 /dist
 /node_modules/
+.vscode/settings.json
+/.vscode

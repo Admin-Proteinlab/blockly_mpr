@@ -1,0 +1,91 @@
+<xml xmlns="http://www.w3.org/1999/xhtml">
+  <toolbox>toolbox_arduino_all</toolbox>
+  <block type="base_setup_loop" id="I!F#C.xIDt*b]N#GdM2f" x="130" y="23">
+    <statement name="DO">
+      <block type="serial_init" id="pK+Xi[E2ow*.R1j/;Nxh">
+        <field name="PINBAUDIOS">9600</field>
+        <next>
+          <block type="otto_configuration" id="NM,d:Gzk)a]8BjOJ*_Ql">
+            <field name="PIN_YL">2</field>
+            <field name="PIN_YR">3</field>
+            <field name="PIN_RL">4</field>
+            <field name="PIN_RR">5</field>
+            <field name="PIN_Buzzer">13</field>
+            <next>
+              <block type="ultrasonic_sensor" id="h3mF]dGIG}#r,|2:e}l]">
+                <field name="US_NUMBER">1</field>
+                <field name="PIN_TRIG">8</field>
+                <field name="PIN_ECHO">9</field>
+                <next>
+                  <block type="variables_set_init" id="[qGI=CJKk;hd6a}cmel|">
+                    <field name="VAR">lectura_sensor</field>
+                    <field name="VARIABLE_SETTYPE_TYPE">NUMBER</field>
+                    <value name="VALUE">
+                      <block type="math_number" id="yhl.;v0nczv%llE8l*nn">
+                        <field name="NUM">0</field>
+                      </block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <statement name="LOOP">
+      <block type="variables_set" id="5pc6lFQU{=IMobosiP2e">
+        <field name="VAR">lectura_sensor</field>
+        <value name="VALUE">
+          <block type="ultrasonic_distance" id="K$.M8JAG{~.[3bFfAu9s">
+            <field name="US_NUMBER">1</field>
+          </block>
+        </value>
+        <next>
+          <block type="serial_println" id="LH:P1pWYX4onofe/ChgI">
+            <value name="CONTENT">
+              <shadow type="text" id="`.+,w@5dgTRJ;biNFFcG">
+                <field name="TEXT">text</field>
+              </shadow>
+              <block type="variables_get" id="nz`4);;g-!)/LqGhupLb">
+                <field name="VAR">lectura_sensor</field>
+              </block>
+            </value>
+            <next>
+              <block type="controls_if" id="c,4+eu9iKfUX8yNA5+SQ">
+                <mutation else="1"></mutation>
+                <value name="IF0">
+                  <block type="logic_compare" id="|O?b-R*!jk2;D:xMo)1~">
+                    <field name="OP">LT</field>
+                    <value name="A">
+                      <block type="variables_get" id="8j%D7%Otv}iib/,ssZvc">
+                        <field name="VAR">lectura_sensor</field>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <shadow type="math_number" id="uP{lH%[8Y)${Lq_JEXGy">
+                        <field name="NUM">10</field>
+                      </shadow>
+                    </value>
+                  </block>
+                </value>
+                <statement name="DO0">
+                  <block type="otto_move" id="+nG/no#|@TNHJ@rP4S0I">
+                    <field name="otto_move_sens">BACKWARD</field>
+                    <field name="otto_move_speed">2000</field>
+                  </block>
+                </statement>
+                <statement name="ELSE">
+                  <block type="otto_move" id="AK{QssVj9vY0P+{y/W1#">
+                    <field name="otto_move_sens">FORWARD</field>
+                    <field name="otto_move_speed">2000</field>
+                  </block>
+                </statement>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>
