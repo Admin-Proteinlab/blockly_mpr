@@ -30,7 +30,7 @@ var MSG = {
   span_select_all: "Verificar todas las categorías",
   survol: "",
   configModalLabel: "Idioma & bloques",
-  exampleModalLabel: "Ejemplos",
+  exampleModalLabel: "",
   levelLabel: "Nivel",
   versionModalLabel: "Descargar",
   variableModalLabel: "Variable",
