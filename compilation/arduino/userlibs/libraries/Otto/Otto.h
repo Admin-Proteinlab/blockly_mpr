@@ -48,6 +48,8 @@ struct OscState {
   int T_ms = 1000;
   double Ph[4] = { 0, 0, 0, 0 };
   float cycles = 1.0;
+  // flag_walk
+  bool walk_new = false;
 
   // Estado actual (rampa de A/O):
   int A_cur[4] = { 0, 0, 0, 0 };
@@ -127,7 +129,7 @@ public:
   bool oscillateServosStep(int A[4], int O[4], int T, double phase_diff[4], float cycle = 1.0f);
 
   // La API original se mantiene:
-  void oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle = 1.0f);
+  void oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle = 1.0f, bool walk_new=false);
 
 
 private:
@@ -157,7 +159,7 @@ private:
 
   unsigned long int getMouthShape(int number);
   unsigned long int getAnimShape(int anim, int index);
-  void _execute(int A[4], int O[4], int T, double phase_diff[4], float steps);
+  void _execute(int A[4], int O[4], int T, double phase_diff[4], float steps, bool walk_new=false);
 };
 
 #endif

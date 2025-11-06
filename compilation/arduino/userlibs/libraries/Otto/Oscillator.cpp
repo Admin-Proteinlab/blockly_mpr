@@ -166,10 +166,6 @@ void Oscillator::SetPosition(int position) {
   // Serial.println(_osc_cpp_SetPosition_delay);
 }
 
-
-
-
-
 /*******************************************************************/
 /* This function should be periodically called                     */
 /* in order to maintain the oscillations. It calculates            */
@@ -198,7 +194,6 @@ void Oscillator::refresh() {
           if (!_servo.attached() && _pin >= 0) {
             _servo.attach(_pin);
           }
-          
           _servo.write(servoPos);
           _lastCmd = (uint8_t)servoPos;
           _lastMotion = now;

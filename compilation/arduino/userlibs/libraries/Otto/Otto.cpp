@@ -149,7 +149,9 @@ bool Otto::oscillateServosStep(int A[4], int O[4], int T, double phase_diff[4], 
   return oscStep_();
 }
 
-void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle){
+void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle, bool walk_new){
+  // 0) pregunta si es walk
+  Serial.print("oscillateServos_flag_walk: "); Serial.println(walk_new);
   // 1) Configurar osciladores
   for (int i=0; i<4; i++) {
     servo[i].SetO(O[i]);
@@ -159,8 +161,8 @@ void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], floa
   }
 
   // 2) Temporización a ~50 Hz (20 ms)
-  const uint16_t FRAME_MS = 1;           // Cadencia servo típica
-  const uint16_t DBG_EVERY = 10;           // Imprime cada 5 frames (≈10 Hz)
+  const uint16_t FRAME_MS = 20;           // Cadencia servo típica
+  const uint16_t DBG_EVERY = 5;           // Imprime cada 5 frames (≈10 Hz)
   unsigned long ref      = millis();
   unsigned long end_time = ref + (unsigned long)(T * cycle);
   unsigned long nextTick = ref; 
@@ -176,6 +178,7 @@ void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], floa
       }
 
       if ((frameCount % DBG_EVERY) == 0) {
+        Serial.print(F("_oscillateServos_flag_frameCount: "));Serial.println(frameCount);
         Serial.println(F("Otto_cpp_oscillateServo frame"));
       }
       frameCount++;
@@ -193,8 +196,8 @@ void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], floa
 }
 
 
-void Otto::_execute(int A[4], int O[4], int T, double phase_diff[4], float steps){
-
+void Otto::_execute(int A[4], int O[4], int T, double phase_diff[4], float steps, bool walk_new){
+  Serial.print("_execute_flag_walk_new: ");Serial.println(walk_new);
   attachServos();
   if(getRestState()==true){
         setRestState(false);
@@ -206,10 +209,10 @@ void Otto::_execute(int A[4], int O[4], int T, double phase_diff[4], float steps
   //-- Execute complete cycles
   if (cycles >= 1)
     for(int i = 0; i < cycles; i++)
-      oscillateServos(A,O, T, phase_diff);
+      oscillateServos(A,O, T, phase_diff, walk_new);
 
   //-- Execute the final not complete cycle
-  oscillateServos(A,O, T, phase_diff,(float)steps-cycles);
+  oscillateServos(A,O, T, phase_diff,(float)steps-cycles, walk_new);
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -362,9 +365,10 @@ void Otto::walk(float steps, int T, int dir){
   int A[4]= {30, 30, 20, 20};
   int O[4] = {0, 0, 4, -4};
   double phase_diff[4] = {0, 0, DEG2RAD(dir * -90), DEG2RAD(dir * -90)};
+  bool walk_new = true;
 
   //-- Let's oscillate the servos!
-  _execute(A, O, T, phase_diff, steps);
+  _execute(A, O, T, phase_diff, steps, walk_new);
 }
 
 //---------------------------------------------------------

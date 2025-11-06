@@ -77,9 +77,9 @@ private:
   unsigned long _lastMotion = 0;      //-- Último movimiento real
 
   // Parámetros de control (ajústalos si necesitas afinar)
-  static const uint16_t SERVO_FRAME_MS = 20;  // 50 Hz
+  static const uint16_t SERVO_FRAME_MS = 10;  // 50 Hz
   static const uint8_t  DEADBAND_DEG   = 2;   // ±2°
-  static const uint16_t IDLE_DETACH_MS = 200; // 200 ms
+  static const uint16_t IDLE_DETACH_MS = 500; // original: 200 ms
 
 };
 
