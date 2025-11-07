@@ -66,6 +66,7 @@ BlocklyDuino.save_com = function() {
 	$("#portserie").blur();
 	var com=$("#portserie").val();
 	window.localStorage.com = com;
+	console.log("save_com ejecutado. Valor guardado:", com);
 };
 BlocklyDuino.renderArduinoCodePreview = function() {
 	var prog = window.localStorage.prog;
