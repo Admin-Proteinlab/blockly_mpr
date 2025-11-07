@@ -7,6 +7,12 @@
 #include "Otto.h"
 #include "Oscillator.h"
 
+// Optional: round-robin servo refresh to reduce current spikes
+#ifndef OTTO_ROUND_ROBIN_OSC
+#define OTTO_ROUND_ROBIN_OSC 1
+#endif
+
+
 void Otto::init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzzer) {
 
   servo_pins[0] = YL;
@@ -15,6 +21,19 @@ void Otto::init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzze
   servo_pins[3] = RR;
 
   attachServos();
+    // --- Default limiter (compile-time configurable) ---
+    #if OTTO_LIMITER_DEFAULT_ON
+      for (int i = 0; i < 4; ++i) {
+        servo[i].SetLimiter(OTTO_DIFF_LIMIT_DEFAULT);
+      }
+      OTTO_DBG_BEGIN();
+      OTTO_DBG_PRINT("Limiter ON, diff_limit = ");
+      OTTO_DBG_PRINTLN(OTTO_DIFF_LIMIT_DEFAULT);
+    #else
+      OTTO_DBG_BEGIN();
+      OTTO_DBG_PRINTLN("Limiter OFF (OTTO_LIMITER_DEFAULT_ON=0)");
+    #endif
+
   isOttoResting=false;
 
   if (load_calibration) {
@@ -24,12 +43,6 @@ void Otto::init(int YL, int YR, int RL, int RR, bool load_calibration, int Buzze
       servo[i].SetTrim(servo_trim);
     }
   }
-
-  for (int i = 0; i < 4; i++){
-    servo_position[i] = 90;
-
-
-  }; 
 
   //Buzzer pin:
   pinBuzzer = Buzzer;
@@ -88,20 +101,45 @@ void Otto::_moveServos(int time, int  servo_target[]) {
         setRestState(false);
   }
 
+  final_time =  millis() + time;
   if(time>10){
-    for (int i = 0; i < 4; i++) increment[i] = ((servo_target[i]) - servo_position[i]) / (time / 10.0);
-    final_time =  millis() + time;
+    for (int i = 0; i < 4; i++) increment[i] = (servo_target[i] - servo[i].getPosition()) / (time / 10.0);
 
     for (int iteration = 1; millis() < final_time; iteration++) {
       partial_time = millis() + 10;
-      for (int i = 0; i < 4; i++) servo[i].SetPosition(servo_position[i] + (iteration * increment[i]));
-      while (millis() < partial_time); //pause
+      static uint8_t rr = 0; // round-robin index 0..3
+      // Update only one servo this tick; multiply step by 4 to keep total duration
+      OTTO_VIS_PRINT("t="); OTTO_VIS_PRINT(millis()); OTTO_VIS_PRINT(" rr="); OTTO_VIS_PRINT(rr); OTTO_VIS_PRINT(" pos->");
+      OTTO_VIS_PRINTLN(servo[rr].getPosition() + (4 * increment[rr]));
+      servo[rr].SetPosition(servo[rr].getPosition() + (4 * increment[rr]));
+      rr = (rr + 1) & 0x03;
+      while (millis() < partial_time); // pause ~10ms
     }
   }
   else{
     for (int i = 0; i < 4; i++) servo[i].SetPosition(servo_target[i]);
+    while (millis() < final_time); //pause
   }
-  for (int i = 0; i < 4; i++) servo_position[i] = servo_target[i];
+
+  // final adjustment to the target. if servo speed limiter is turned on, reaching to the goal may take longer than 
+  // requested time.
+  bool f = true;
+  while(f) {
+    f = false;
+    for (int i = 0; i < 4; i++) {
+      if (servo_target[i] != servo[i].getPosition()) {
+        f = true;
+        break;
+      }
+    }
+    if (f) {
+      for (int i = 0; i < 4; i++) {
+        servo[i].SetPosition(servo_target[i]);
+      }
+      partial_time = millis() + 10;
+      while (millis() < partial_time); //pause
+    }
+  };
 }
 
 void Otto::_moveSingle(int position, int servo_number) {
@@ -126,67 +164,29 @@ if (servoNumber == 3){
 }
 }
 
-// void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle=1){
+void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle=1){
 
-//   for (int i=0; i<4; i++) {
-//     servo[i].SetO(O[i]);
-//     servo[i].SetA(A[i]);
-//     servo[i].SetT(T);
-//     servo[i].SetPh(phase_diff[i]);
-//   }
-//   double ref=millis();
-//    for (double x=ref; x<=T*cycle+ref; x=millis()){
-//      for (int i=0; i<4; i++){
-//         servo[i].refresh();
-//         //delayMicroseconds(100);
-//         Serial.println("Otto_cpp_oscillateServo!_delay");
-//      }
-//   }
-// }
-
-void Otto::oscillateServos(int A[4], int O[4], int T, double phase_diff[4], float cycle=1.0){
-  // 1) Configurar osciladores
   for (int i=0; i<4; i++) {
     servo[i].SetO(O[i]);
     servo[i].SetA(A[i]);
     servo[i].SetT(T);
     servo[i].SetPh(phase_diff[i]);
   }
-
-  // 2) Temporización a ~50 Hz (20 ms)
-  const uint16_t FRAME_MS = 20;           // Cadencia servo típica
-  const uint16_t DBG_EVERY = 5;           // Imprime cada 5 frames (≈10 Hz)
-  unsigned long ref      = millis();
-  unsigned long end_time = ref + (unsigned long)(T * cycle);
-  unsigned long nextTick = ref; 
-  uint32_t frameCount    = 0;
-
-  // 3) Bucle con esperas discretas, no busy-spin
-  while ( (long)(millis() - end_time) < 0 ) {
-    unsigned long now = millis();
-    if ((long)(now - nextTick) >= 0) {
-      // Actualizamos solo a 50 Hz
-      for (int i=0; i<4; i++){
-        servo[i].refresh();
-      }
-
-      if ((frameCount % DBG_EVERY) == 0) {
-        Serial.println(F("Otto_cpp_oscillateServo frame"));
-      }
-      frameCount++;
-      nextTick += FRAME_MS;
+  double ref=millis();
+   for (double x=ref; x<=T*cycle+ref; x=millis()){
+     #if OTTO_ROUND_ROBIN_OSC
+    static uint8_t rr = 0;
+    OTTO_VIS_PRINT("t="); OTTO_VIS_PRINT(millis()); OTTO_VIS_PRINT(" rr="); OTTO_VIS_PRINTLN(rr);
+    servo[rr].refresh();
+    rr = (rr + 1) & 0x03;
+#else
+    OTTO_VIS_PRINT("t="); OTTO_VIS_PRINT(millis()); OTTO_VIS_PRINTLN(" refresh all");
+    for (int i=0; i<4; i++){
+      servo[i].refresh();
     }
-
-    // Cede CPU hasta el siguiente frame (ahorra energía)
-    // Si usas sleep idle en loop(), esto permite que el micro duerma:
-    delay(1); // ~1ms es suficiente para no saturar
+#endif
   }
-
-  // 4) Opción: al terminar, si A[] son todos 0 o estamos cerca de home, detach
-  // (deadband ~1–2°; aquí solo esbozo)
-  // for(int i=0;i<4;i++){ /* si estable -> servo[i].detach(); */ }
 }
-
 
 void Otto::_execute(int A[4], int O[4], int T, double phase_diff[4], float steps = 1.0){
 
@@ -213,8 +213,9 @@ void Otto::_execute(int A[4], int O[4], int T, double phase_diff[4], float steps
 void Otto::home(){
 
   if(isOttoResting==false){ //Go to rest position only if necessary
+
     int homes[4]={90, 90, 90, 90}; //All the servos at rest position
-    _moveServos(2000,homes);   //Move the servos in half a second, default:500,new:2000
+    _moveServos(500,homes);   //Move the servos in half a second
 
     detachServos();
     isOttoResting=true;
@@ -777,29 +778,15 @@ void Otto::sing(int songName){
 ///////////////////////////////////////////////////////////////////
 
 void Otto::playGesture(int gesture){
-
-  int sadPos[4]=      {110, 70, 20, 160};
-  int bedPos[4]=      {100, 80, 60, 120};
-  int fartPos_1[4]=   {90, 90, 145, 122}; //rightBend
-  int fartPos_2[4]=   {90, 90, 80, 122};
-  int fartPos_3[4]=   {90, 90, 145, 80};
-  int confusedPos[4]= {110, 70, 90, 90};
-  int angryPos[4]=    {90, 90, 70, 110};
-  int headLeft[4]=    {110, 110, 90, 90};
-  int headRight[4]=   {70, 70, 90, 90};
-  int fretfulPos[4]=  {90, 90, 90, 110};
-  int bendPos_1[4]=   {90, 90, 70, 35};
-  int bendPos_2[4]=   {90, 90, 55, 35};
-  int bendPos_3[4]=   {90, 90, 42, 35};
-  int bendPos_4[4]=   {90, 90, 34, 35};
-
+ int gesturePOSITION[4];
+  
   switch(gesture){
 
-    case OttoHappy:
+    case OttoHappy: 
         _tone(note_E5,50,30);
         putMouth(smile);
         sing(S_happy_short);
-        swing(1,800,20);
+        swing(1,800,20); 
         sing(S_happy_short);
 
         home();
@@ -815,19 +802,23 @@ void Otto::playGesture(int gesture){
         putMouth(happyOpen);
         sing(S_superHappy);
         putMouth(happyClosed);
-        tiptoeSwing(1,500,20);
+        tiptoeSwing(1,500,20); 
 
-        home();
+        home();  
         putMouth(happyOpen);
     break;
 
 
-    case OttoSad:
+    case OttoSad: 
         putMouth(sad);
-        _moveServos(700, sadPos);
+        gesturePOSITION[0] = 110;//int sadPos[6]=      {110, 70, 20, 160};
+        gesturePOSITION[1] = 70;
+         gesturePOSITION[2] = 20;
+          gesturePOSITION[3] = 160;
+        _moveServos(700, gesturePOSITION);     
         bendTones(880, 830, 1.02, 20, 200);
         putMouth(sadClosed);
-        bendTones(830, 790, 1.02, 20, 200);
+        bendTones(830, 790, 1.02, 20, 200);  
         putMouth(sadOpen);
         bendTones(790, 740, 1.02, 20, 200);
         putMouth(sadClosed);
@@ -844,64 +835,83 @@ void Otto::playGesture(int gesture){
 
 
     case OttoSleeping:
-        _moveServos(700, bedPos);
-
+    gesturePOSITION[0] = 100;//int bedPos[6]=      {100, 80, 60, 120};
+        gesturePOSITION[1] = 80;
+         gesturePOSITION[2] = 60;
+          gesturePOSITION[3] = 120;
+        _moveServos(700, gesturePOSITION);     
         for(int i=0; i<4;i++){
           putAnimationMouth(dreamMouth,0);
           bendTones (100, 200, 1.04, 10, 10);
           putAnimationMouth(dreamMouth,1);
-          bendTones (200, 300, 1.04, 10, 10);
+          bendTones (200, 300, 1.04, 10, 10);  
           putAnimationMouth(dreamMouth,2);
-          bendTones (300, 500, 1.04, 10, 10);
+          bendTones (300, 500, 1.04, 10, 10);   
           delay(500);
           putAnimationMouth(dreamMouth,1);
-          bendTones (400, 250, 1.04, 10, 1);
+          bendTones (400, 250, 1.04, 10, 1); 
           putAnimationMouth(dreamMouth,0);
-          bendTones (250, 100, 1.04, 10, 1);
+          bendTones (250, 100, 1.04, 10, 1); 
           delay(500);
-        }
+        } 
 
         putMouth(lineMouth);
         sing(S_cuddly);
 
-        home();
+        home();  
         putMouth(happyOpen);
     break;
 
 
     case OttoFart:
-        _moveServos(500,fartPos_1);
-        delay(300);
+    gesturePOSITION[0] = 90;// int fartPos_1[6]=   {90, 90, 145, 122};
+        gesturePOSITION[1] = 90;
+         gesturePOSITION[2] = 145;
+          gesturePOSITION[3] = 122;
+        _moveServos(500,gesturePOSITION);
+        delay(300);     
         putMouth(lineMouth);
-        sing(S_fart1);
+        sing(S_fart1);  
         putMouth(tongueOut);
         delay(250);
-        _moveServos(500,fartPos_2);
+        gesturePOSITION[0] = 90;// int fartPos_2[6]=   {90, 90, 80, 122};
+        gesturePOSITION[1] = 90;
+         gesturePOSITION[2] = 80;
+          gesturePOSITION[3] = 122;
+        _moveServos(500,gesturePOSITION);
         delay(300);
         putMouth(lineMouth);
-        sing(S_fart2);
+        sing(S_fart2); 
         putMouth(tongueOut);
         delay(250);
-        _moveServos(500,fartPos_3);
+        gesturePOSITION[0] = 90;// int fartPos_3[6]=   {90, 90, 145, 80};
+        gesturePOSITION[1] = 90;
+         gesturePOSITION[2] = 145;
+          gesturePOSITION[3] = 80;
+        _moveServos(500,gesturePOSITION);
         delay(300);
         putMouth(lineMouth);
         sing(S_fart3);
-        putMouth(tongueOut);
+        putMouth(tongueOut);    
         delay(300);
 
-        home();
-        delay(500);
+        home(); 
+        delay(500); 
         putMouth(happyOpen);
     break;
 
 
     case OttoConfused:
-        _moveServos(300, confusedPos);
+    gesturePOSITION[0] = 110;//int confusedPos[6]= {110, 70, 90, 90};
+        gesturePOSITION[1] = 70;
+         gesturePOSITION[2] = 90;
+          gesturePOSITION[3] = 90;
+        _moveServos(300, gesturePOSITION); 
         putMouth(confused);
         sing(S_confused);
         delay(500);
 
-        home();
+        home();  
         putMouth(happyOpen);
     break;
 
@@ -911,14 +921,18 @@ void Otto::playGesture(int gesture){
         sing(S_cuddly);
         crusaito(2,1500,15,1);
 
-        home();
-        sing(S_happy_short);
+        home(); 
+        sing(S_happy_short);  
         putMouth(happyOpen);
     break;
 
 
-    case OttoAngry:
-        _moveServos(300, angryPos);
+    case OttoAngry: 
+    gesturePOSITION[0] = 90;//int angryPos[6]=    {90, 90, 70, 110};
+        gesturePOSITION[1] = 90;
+         gesturePOSITION[2] = 70;
+          gesturePOSITION[3] = 110;
+        _moveServos(300, gesturePOSITION); 
         putMouth(angry);
 
         _tone(note_A5,100,30);
@@ -928,17 +942,25 @@ void Otto::playGesture(int gesture){
         delay(15);
         bendTones(note_A5, note_E5, 1.02, 20, 4);
         delay(400);
-        _moveServos(200, headLeft);
+        gesturePOSITION[0] = 110;//int headLeft[6]=    {110, 110, 90, 90};
+        gesturePOSITION[1] = 110;
+         gesturePOSITION[2] = 90;
+          gesturePOSITION[3] = 90;
+        _moveServos(200, gesturePOSITION); 
         bendTones(note_A5, note_D6, 1.02, 20, 4);
-        _moveServos(200, headRight);
+        gesturePOSITION[0] = 70;//int headRight[6]=   {70, 70, 90, 90};
+        gesturePOSITION[1] = 70;
+         gesturePOSITION[2] = 90;
+          gesturePOSITION[3] = 90;
+        _moveServos(200, gesturePOSITION); 
         bendTones(note_A5, note_E5, 1.02, 20, 4);
 
-        home();
+        home();  
         putMouth(happyOpen);
     break;
 
 
-    case OttoFretful:
+    case OttoFretful: 
         putMouth(angry);
         bendTones(note_A5, note_D6, 1.02, 20, 4);
         bendTones(note_A5, note_E5, 1.02, 20, 4);
@@ -946,14 +968,18 @@ void Otto::playGesture(int gesture){
         putMouth(lineMouth);
 
         for(int i=0; i<4; i++){
-          _moveServos(100, fretfulPos);
+          gesturePOSITION[0] = 90;//int fretfulPos[6]=  {90, 90, 90, 110};
+        gesturePOSITION[1] = 90;
+         gesturePOSITION[2] = 90;
+          gesturePOSITION[3] = 110;
+          _moveServos(100, gesturePOSITION);   
           home();
         }
 
         putMouth(angry);
         delay(500);
 
-        home();
+        home();  
         putMouth(happyOpen);
     break;
 
@@ -962,15 +988,15 @@ void Otto::playGesture(int gesture){
 
         //Initial note frecuency = 400
         //Final note frecuency = 1000
-
+        
         // Reproduce the animation four times
-        for(int i = 0; i<4; i++){
+        for(int i = 0; i<4; i++){ 
 
-          int noteM = 400;
+          int noteM = 400; 
 
             for(int index = 0; index<6; index++){
               putAnimationMouth(adivinawi,index);
-              bendTones(noteM, noteM+100, 1.04, 10, 10);    //400 -> 1000
+              bendTones(noteM, noteM+100, 1.04, 10, 10);    //400 -> 1000 
               noteM+=100;
             }
 
@@ -979,44 +1005,44 @@ void Otto::playGesture(int gesture){
 
             for(int index = 0; index<6; index++){
               putAnimationMouth(adivinawi,index);
-              bendTones(noteM, noteM+100, 1.04, 10, 10);    //1000 -> 400
+              bendTones(noteM, noteM+100, 1.04, 10, 10);    //1000 -> 400 
               noteM-=100;
             }
-        }
-
+        } 
+ 
         delay(300);
         putMouth(happyOpen);
     break;
 
 
     case OttoWave:
-
+        
         // Reproduce the animation four times
-        for(int i = 0; i<2; i++){
+        for(int i = 0; i<2; i++){ 
 
-            int noteW = 500;
+            int noteW = 500; 
 
             for(int index = 0; index<10; index++){
               putAnimationMouth(wave,index);
-              bendTones(noteW, noteW+100, 1.02, 10, 10);
+              bendTones(noteW, noteW+100, 1.02, 10, 10); 
               noteW+=101;
             }
             for(int index = 0; index<10; index++){
               putAnimationMouth(wave,index);
-              bendTones(noteW, noteW+100, 1.02, 10, 10);
+              bendTones(noteW, noteW+100, 1.02, 10, 10); 
               noteW+=101;
             }
             for(int index = 0; index<10; index++){
               putAnimationMouth(wave,index);
-              bendTones(noteW, noteW-100, 1.02, 10, 10);
+              bendTones(noteW, noteW-100, 1.02, 10, 10); 
               noteW-=101;
             }
             for(int index = 0; index<10; index++){
               putAnimationMouth(wave,index);
-              bendTones(noteW, noteW-100, 1.02, 10, 10);
+              bendTones(noteW, noteW-100, 1.02, 10, 10); 
               noteW-=101;
             }
-        }
+        }    
 
         clearMouth();
         delay(100);
@@ -1024,11 +1050,11 @@ void Otto::playGesture(int gesture){
     break;
 
     case OttoVictory:
-
+        
         putMouth(smallSurprise);
         //final pos   = {90,90,150,30}
         for (int i = 0; i < 60; ++i){
-          int pos[]={90,90,90+i,90-i};
+          int pos[]={90,90,90+i,90-i};  
           _moveServos(10,pos);
           _tone(1600+i*20,15,1);
         }
@@ -1036,7 +1062,7 @@ void Otto::playGesture(int gesture){
         putMouth(bigSurprise);
         //final pos   = {90,90,90,90}
         for (int i = 0; i < 60; ++i){
-          int pos[]={90,90,150-i,30+i};
+          int pos[]={90,90,150-i,30+i};  
           _moveServos(10,pos);
           _tone(2800+i*20,15,1);
         }
@@ -1047,7 +1073,7 @@ void Otto::playGesture(int gesture){
         tiptoeSwing(1,500,20);
         sing(S_superHappy);
         putMouth(happyClosed);
-        tiptoeSwing(1,500,20);
+        tiptoeSwing(1,500,20); 
         //-----
 
         home();
@@ -1057,22 +1083,37 @@ void Otto::playGesture(int gesture){
     break;
 
     case OttoFail:
-
         putMouth(sadOpen);
-        _moveServos(300,bendPos_1);
+         gesturePOSITION[0] = 90;//int bendPos_1[6]=   {90, 90, 70, 35};
+        gesturePOSITION[1] = 90;
+         gesturePOSITION[2] = 70;
+          gesturePOSITION[3] = 35;
+        _moveServos(300,gesturePOSITION);
         _tone(900,200,1);
         putMouth(sadClosed);
-        _moveServos(300,bendPos_2);
+        gesturePOSITION[0] = 90;//int bendPos_2[6]=   {90, 90, 55, 35};
+        gesturePOSITION[1] = 90;
+         gesturePOSITION[2] = 55;
+          gesturePOSITION[3] = 35;
+        _moveServos(300,gesturePOSITION);
         _tone(600,200,1);
         putMouth(confused);
-        _moveServos(300,bendPos_3);
+        gesturePOSITION[0] = 90;//int bendPos_3[6]=   {90, 90, 42, 35};
+        gesturePOSITION[1] = 90;
+         gesturePOSITION[2] = 42;
+          gesturePOSITION[3] = 35;
+        _moveServos(300,gesturePOSITION);
         _tone(300,200,1);
-        _moveServos(300,bendPos_4);
+        gesturePOSITION[0] = 90;//int bendPos_4[6]=   {90, 90, 34, 35};
+        gesturePOSITION[1] = 90;
+         gesturePOSITION[2] = 34;
+          gesturePOSITION[3] = 35;
+        _moveServos(300,gesturePOSITION);
         putMouth(xMouth);
 
         detachServos();
         _tone(150,2200,1);
-
+        
         delay(600);
         clearMouth();
         putMouth(happyOpen);
@@ -1080,5 +1121,17 @@ void Otto::playGesture(int gesture){
 
     break;
 
+  }
+} 
+
+void Otto::enableServoLimit(int diff_limit) {
+  for (int i = 0; i < 4; i++) {
+    servo[i].SetLimiter(diff_limit);
+  }
+}
+
+void Otto::disableServoLimit() {
+  for (int i = 0; i < 4; i++) {
+    servo[i].DisableLimiter();
   }
 }
