@@ -254,7 +254,7 @@
             <statement name="DO">
               <block type="otto_move" id="savtPvEnt5BHcuzD4l,:">
                 <field name="otto_move_sens">FORWARD</field>
-                <field name="otto_move_speed">1000</field>
+                <field name="otto_move_speed">2000</field>
               </block>
             </statement>
           </block>
@@ -310,12 +310,12 @@
                     <next>
                       <block type="otto_dance" id="H;UMIBlAObrU`UeRCF=b">
                         <field name="otto_dance_movement">crusaitoRIGHT</field>
-                        <field name="otto_move_speed">1000</field>
+                        <field name="otto_move_speed">2000</field>
                         <field name="otto_dance_size">25</field>
                         <next>
                           <block type="otto_dance" id="c+0hE.FBL9Rw%6hhKP?0">
                             <field name="otto_dance_movement">crusaitoLEFT</field>
-                            <field name="otto_move_speed">1000</field>
+                            <field name="otto_move_speed">2000</field>
                             <field name="otto_dance_size">25</field>
                             <next>
                               <block type="otto_sound" id="vF:?u}vaSEbx(Rt]%t=c">
@@ -371,7 +371,7 @@
             <field name="TEXT">trims[3]</field>
           </block>
         </value>
-        <next>
+        <next>  
           <block type="otto_moveservos" id="ZQS_`hsaVHpb*O`S:$q*">
             <value name="Period">
               <shadow type="math_number" id="f^dWhhFjsOblNd[EP)b=">

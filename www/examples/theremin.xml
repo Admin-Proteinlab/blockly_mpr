@@ -4,11 +4,11 @@
     <statement name="DO">
       <block type="ultrasonic_sensor" id="t3s}U]w0r_IToHmYthhE">
         <field name="US_NUMBER">1</field>
-        <field name="PIN_TRIG">5</field>
-        <field name="PIN_ECHO">4</field>
+        <field name="PIN_TRIG">8</field>
+        <field name="PIN_ECHO">9</field>
         <next>
           <block type="buzzer_init" id="|#8/wzOER{^=2QfK|SnL">
-            <field name="PIN">D5</field>
+            <field name="PIN">13</field>
           </block>
         </next>
       </block>
