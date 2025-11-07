@@ -394,7 +394,7 @@
 			<block type="VL53L0X"></block>
 			<block type="VL53L0X_distance"></block>
 		</category>
-
+		
 		<category name="CAT_SOUND" colour="#54BCF7">
 				<block type="Sound_status_sensor2"></block>
 				<block type="Sound_sensor2"></block>

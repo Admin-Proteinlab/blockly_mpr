@@ -181,8 +181,8 @@ body {
 }
 #btn_group {
 	position: absolute;
-	right: 5px;
-	top: 2px;
+	right: 10px;
+	top: 10px;
 	z-index: 10
 
 }
