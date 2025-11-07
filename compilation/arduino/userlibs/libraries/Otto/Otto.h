@@ -16,7 +16,7 @@
 
 // ===== Otto Debug Config =====
 #ifndef OTTO_DBG
-  #define OTTO_DBG 1          // 1 = enable Serial debug, 0 = compiled out
+  #define OTTO_DBG 0          // 1 = enable Serial debug, 0 = compiled out
 #endif
 
 #ifndef OTTO_DBG_BAUD
