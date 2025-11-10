@@ -1,0 +1,192 @@
+<xml xmlns="http://www.w3.org/1999/xhtml">
+  <toolbox>toolbox_arduino_all</toolbox>
+  <block type="base_setup_loop" id="R*0Ak;fVj_4-x[V~7WxF" x="1109" y="-464">
+    <statement name="DO">
+      <block type="otto_configuration" id="oIn,$Q|D$rXx$wfJ8yNp">
+        <field name="PIN_YL">2</field>
+        <field name="PIN_YR">3</field>
+        <field name="PIN_RL">4</field>
+        <field name="PIN_RR">5</field>
+        <field name="PIN_Buzzer">13</field>
+        <next>
+          <block type="variables_set_init" id="(=5M{@D([)u(2@YGJwXC">
+            <field name="VAR">Gesto</field>
+            <field name="VARIABLE_SETTYPE_TYPE">NUMBER</field>
+            <value name="VALUE">
+              <block type="math_number" id="ml[o@_g!GBmN[96ZB`!h">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+            <next>
+              <block type="RTTTL_music" id="+^d}a*~7?g:;!zbXL6e}">
+                <field name="PIN_BUZZER">13</field>
+                <field name="MELODY">Short</field>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <statement name="LOOP">
+      <block type="variables_set" id="T*hO7]4:7S.PLPQspzb9">
+        <field name="VAR">Gesto</field>
+        <value name="VALUE">
+          <block type="math_random_int" id="Mv7hgU{3DODt$Klr1*rX">
+            <value name="FROM">
+              <shadow type="math_number" id=".#l1o3rehL/^VPm=2z5T">
+                <field name="NUM">1</field>
+              </shadow>
+            </value>
+            <value name="TO">
+              <shadow type="math_number" id="G2,tqBR+kSZ@VqM]+1uU">
+                <field name="NUM">5</field>
+              </shadow>
+            </value>
+          </block>
+        </value>
+        <next>
+          <block type="base_delay" id=")ODm@2?IU7xzE(CM2R!#">
+            <field name="unite">s</field>
+            <value name="DELAY_TIME">
+              <shadow type="math_number" id="skA,]?7n,jXM,pI:8gWt">
+                <field name="NUM">1</field>
+              </shadow>
+            </value>
+            <next>
+              <block type="controls_if" id="C]Z9_b[Jp/mb`6cno4:0">
+                <value name="IF0">
+                  <block type="logic_compare" id="a{dnVr*a!|X5vEQjy?5i">
+                    <field name="OP">EQ</field>
+                    <value name="A">
+                      <block type="variables_get" id="g_{x{)-U4h?3x)Lx]{4a">
+                        <field name="VAR">Gesto</field>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <shadow type="math_number" id="|hA0L`4Klk.6}2)KreZ(">
+                        <field name="NUM">1</field>
+                      </shadow>
+                    </value>
+                  </block>
+                </value>
+                <statement name="DO0">
+                  <block type="otto_dance" id="$#n`xZ!Yj=MlMz6/?uDW">
+                    <field name="otto_dance_movement">crusaitoRIGHT</field>
+                    <field name="otto_move_speed">2000</field>
+                    <field name="otto_dance_size">10</field>
+                  </block>
+                </statement>
+                <next>
+                  <block type="controls_if" id="1#k1hgtAK_*MPGPig?]!">
+                    <value name="IF0">
+                      <block type="logic_compare" id="|xH(Ix?.?rk;a~398+Vp">
+                        <field name="OP">EQ</field>
+                        <value name="A">
+                          <block type="variables_get" id="p1;APk$W=0*Qt0]{)V}u">
+                            <field name="VAR">Gesto</field>
+                          </block>
+                        </value>
+                        <value name="B">
+                          <shadow type="math_number" id="uPP!0vt}Da,v-T0wt;Zw">
+                            <field name="NUM">2</field>
+                          </shadow>
+                        </value>
+                      </block>
+                    </value>
+                    <statement name="DO0">
+                      <block type="otto_move" id="2!ReXbxtw7$s;}JJ@*Dg">
+                        <field name="otto_move_sens">FORWARD</field>
+                        <field name="otto_move_speed">2000</field>
+                      </block>
+                    </statement>
+                    <next>
+                      <block type="controls_if" id="^hRbG^i/$,[A90EqH@~L">
+                        <value name="IF0">
+                          <block type="logic_compare" id="7$:oG6Mkv}1feT%3g43e">
+                            <field name="OP">EQ</field>
+                            <value name="A">
+                              <block type="variables_get" id="sAi?%je[xC,xhY/0$hNn">
+                                <field name="VAR">Gesto</field>
+                              </block>
+                            </value>
+                            <value name="B">
+                              <shadow type="math_number" id="aT1k{(CP8|%~.t;_yH]~">
+                                <field name="NUM">3</field>
+                              </shadow>
+                            </value>
+                          </block>
+                        </value>
+                        <statement name="DO0">
+                          <block type="otto_move" id="Zx5[JCV-#`iw3.Lc$TBA">
+                            <field name="otto_move_sens">BENDRIGHT</field>
+                            <field name="otto_move_speed">2000</field>
+                          </block>
+                        </statement>
+                        <next>
+                          <block type="controls_if" id="G|_0=p}LI|@K65c.P;[t">
+                            <value name="IF0">
+                              <block type="logic_compare" id="3|)eeQUlJ67My4:5|-;n">
+                                <field name="OP">EQ</field>
+                                <value name="A">
+                                  <block type="variables_get" id=";ss6S+Tu*IO~pYZY.P]%">
+                                    <field name="VAR">Gesto</field>
+                                  </block>
+                                </value>
+                                <value name="B">
+                                  <shadow type="math_number" id="I)nwfi!`7|/|AIW^u4qy">
+                                    <field name="NUM">4</field>
+                                  </shadow>
+                                </value>
+                              </block>
+                            </value>
+                            <statement name="DO0">
+                              <block type="otto_dance" id="w/%XlC)q3z[CG=g@Dg8g">
+                                <field name="otto_dance_movement">moonwalkerRIGHT</field>
+                                <field name="otto_move_speed">750</field>
+                                <field name="otto_dance_size">40</field>
+                              </block>
+                            </statement>
+                            <next>
+                              <block type="controls_if" id="(mf)IXT*wt*(ryxbuVEy">
+                                <value name="IF0">
+                                  <block type="logic_compare" id="RRmnFHAG??VXlsMNAH(*">
+                                    <field name="OP">EQ</field>
+                                    <value name="A">
+                                      <block type="variables_get" id="l~;(,R4LvjNJ+/`9U;x[">
+                                        <field name="VAR">Gesto</field>
+                                      </block>
+                                    </value>
+                                    <value name="B">
+                                      <shadow type="math_number" id="##~lko9SggXF@+@pqJT(">
+                                        <field name="NUM">5</field>
+                                      </shadow>
+                                    </value>
+                                  </block>
+                                </value>
+                                <statement name="DO0">
+                                  <block type="otto_move" id="q3?+:41n/zDs*_=EmxX1">
+                                    <field name="otto_move_sens">jump</field>
+                                    <field name="otto_move_speed">750</field>
+                                  </block>
+                                </statement>
+                                <next>
+                                  <block type="otto_sound" id="CbNpgRtAUK4lm{H#k[,V">
+                                    <field name="otto_sound">S_superHappy</field>
+                                  </block>
+                                </next>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>

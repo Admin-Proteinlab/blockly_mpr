@@ -1,9 +1,10 @@
 [
     {"text":"Ejemplos Mi Primer Robot","visible": true},
+    {"source_url": "Ottowalk.xml","source_text": "🚶 Caminar","visible": true},
     {"source_url": "mpr_sing.xml","source_text": "🎤 Canto","visible": true},
-    {"source_url": "Ottodancerandom.xml","source_text": "🕺 Baile Improvisado","visible": true},
-    {"source_url": "mpr_salto.xml","source_text": "🦘 Salto","visible": true},
-    {"source_url": "mpr_balance.xml","source_text": "⚖️ Equilibrio","visible": false},
+    {"source_url": "mpr_randommove.xml","source_text": "🕺 Movimiento Improvisado","visible": true},
+    {"source_url": "mpr_meneito.xml","source_text": "💃 Meneito","visible": true},
+    {"source_url": "mpr_balance.xml","source_text": "⚖️ Equilibrio","visible": true},
     {"source_url": "mpr_cerro.xml","source_text": "⛰️ Subir el Cerro Renca","visible": true},
 
     {"text":"Explora otros ejemplos","visible": true},

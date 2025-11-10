@@ -11,116 +11,44 @@
       </block>
     </statement>
     <statement name="LOOP">
-      <block type="otto_movelegs" id="Kpei(2awGxj{_4Af~E6y">
-        <value name="PIN_YL">
-          <shadow type="inout_angle_maths" id="Cl|#PZPrTzCHWHUH[Hgn">
-            <field name="ANGLE">135</field>
-          </shadow>
-        </value>
-        <value name="PIN_YR">
-          <shadow type="inout_angle_maths" id="5tj(8[L.*yK#hkf8fyD)">
-            <field name="ANGLE">90</field>
-          </shadow>
-        </value>
-        <value name="PIN_RL">
-          <shadow type="inout_angle_maths" id="2AW{8GK-jYK!|+Q:FG4d">
-            <field name="ANGLE">150</field>
-          </shadow>
-        </value>
-        <value name="PIN_RR">
-          <shadow type="inout_angle_maths" id=",PW9MYgon1|+IO~IVYlq">
-            <field name="ANGLE">90</field>
-          </shadow>
-        </value>
-        <value name="TEMPO">
-          <shadow type="math_number" id="1l0(S)Na~O%BX%X[Pp|5">
-            <field name="NUM">1500</field>
-          </shadow>
-        </value>
+      <block type="otto_home" id="y7k5NwyY1)o2$THBKTF,">
         <next>
-          <block type="otto_movelegs" id="|%zIftOSWA(ei=.VJAX_">
-            <value name="PIN_YL">
-              <shadow type="inout_angle_maths" id="Wr?7CTDxH@?#,UJXoSpi">
-                <field name="ANGLE">150</field>
-              </shadow>
-            </value>
-            <value name="PIN_YR">
-              <shadow type="inout_angle_maths" id="OGNb6zme7F/rfI%1P2n(">
-                <field name="ANGLE">90</field>
-              </shadow>
-            </value>
-            <value name="PIN_RL">
-              <shadow type="inout_angle_maths" id="{,z1?K0[CL.#LG=mHfoJ">
-                <field name="ANGLE">90</field>
-              </shadow>
-            </value>
-            <value name="PIN_RR">
-              <shadow type="inout_angle_maths" id="HUr0;O-SYrlIL%t287f~">
-                <field name="ANGLE">130</field>
-              </shadow>
-            </value>
-            <value name="TEMPO">
-              <shadow type="math_number" id="jhza`G6pv-pp?{f2J(7a">
-                <field name="NUM">1500</field>
-              </shadow>
-            </value>
+          <block type="otto_move" id="eTel6FJe@e7ZQ8$}!tml">
+            <field name="otto_move_sens">BENDRIGHT</field>
+            <field name="otto_move_speed">2000</field>
             <next>
-              <block type="base_delay" id="@%!yMuwJCH0H{6Q|j#s%">
-                <field name="unite">s</field>
-                <value name="DELAY_TIME">
-                  <shadow type="math_number" id="U5tx!mWi:lo%TRUK:]L]">
-                    <field name="NUM">1</field>
+              <block type="controls_repeat_ext" id="P./=f764D{l7M0[lnSfa">
+                <value name="TIMES">
+                  <shadow type="math_number" id="S!-YxYs;]?,r5rMA:Il%">
+                    <field name="NUM">5</field>
                   </shadow>
                 </value>
+                <statement name="DO">
+                  <block type="otto_move" id="[xECwLv=%0~SWmL@@[rw">
+                    <field name="otto_move_sens">SHAKELEFT</field>
+                    <field name="otto_move_speed">2000</field>
+                  </block>
+                </statement>
                 <next>
-                  <block type="controls_repeat_ext" id="Ui(57LwJf$|*vT%tIayj">
-                    <value name="TIMES">
-                      <shadow type="math_number" id="F]KnPU`ph67#)c=1imaB">
-                        <field name="NUM">4</field>
+                  <block type="base_delay" id="@%!yMuwJCH0H{6Q|j#s%">
+                    <field name="unite">s</field>
+                    <value name="DELAY_TIME">
+                      <shadow type="math_number" id="U5tx!mWi:lo%TRUK:]L]">
+                        <field name="NUM">1</field>
                       </shadow>
                     </value>
-                    <statement name="DO">
-                      <block type="otto_sound" id=")::.G1`E2#Fc*3y-u%Oj">
-                        <field name="otto_sound"> S_cuddly </field>
-                      </block>
-                    </statement>
                     <next>
-                      <block type="otto_movelegs" id="o,ZLt^;{5I~+=$t$%?BS">
-                        <value name="PIN_YL">
-                          <shadow type="inout_angle_maths" id="?0ISp`6w?X$0yk.S4w(.">
-                            <field name="ANGLE">90</field>
+                      <block type="controls_repeat_ext" id="Ui(57LwJf$|*vT%tIayj">
+                        <value name="TIMES">
+                          <shadow type="math_number" id="F]KnPU`ph67#)c=1imaB">
+                            <field name="NUM">4</field>
                           </shadow>
                         </value>
-                        <value name="PIN_YR">
-                          <shadow type="inout_angle_maths" id="XrxnJYGdh;D$P=3=h/_}">
-                            <field name="ANGLE">90</field>
-                          </shadow>
-                        </value>
-                        <value name="PIN_RL">
-                          <shadow type="inout_angle_maths" id="]_PG.s=xD|GTmfm=(!nT">
-                            <field name="ANGLE">90</field>
-                          </shadow>
-                        </value>
-                        <value name="PIN_RR">
-                          <shadow type="inout_angle_maths" id="c1VR66MR~YoFzfiAi;MN">
-                            <field name="ANGLE">90</field>
-                          </shadow>
-                        </value>
-                        <value name="TEMPO">
-                          <shadow type="math_number" id="X#jgC)HR%DLgaf(Ip*k*">
-                            <field name="NUM">1500</field>
-                          </shadow>
-                        </value>
-                        <next>
-                          <block type="base_delay" id="j:J#)XyfBF-Mt~]Z){Xs">
-                            <field name="unite">s</field>
-                            <value name="DELAY_TIME">
-                              <shadow type="math_number" id="Vr4llzK=z6]x12!:D-Bd">
-                                <field name="NUM">2</field>
-                              </shadow>
-                            </value>
+                        <statement name="DO">
+                          <block type="otto_sound" id=")::.G1`E2#Fc*3y-u%Oj">
+                            <field name="otto_sound"> S_cuddly </field>
                           </block>
-                        </next>
+                        </statement>
                       </block>
                     </next>
                   </block>
