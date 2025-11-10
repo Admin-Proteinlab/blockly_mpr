@@ -94,10 +94,12 @@ body {
 #title-project-name {
 	margin-left: 0px;
   border-radius: 10px;
-	color: #1841c7;
+	color: #e9f9f9;
 	font-weight: bold;
   width: 155px;
 	height: 42px;
+	background-color: #7998ff;
+	border: none;
 }
 #title-bar-btns {
 	-webkit-app-region: no-drag;
@@ -148,6 +150,21 @@ body {
 	position: absolute;
 	text-align: center
 }
+
+.disclaimer {
+	font-size: 10px !important;
+	font-style: italic;
+	font-weight: 400 !important;
+	margin-top: 20px !important;
+}
+
+.example-text {
+  font-weight: bold;
+  color: #555;
+  display: block;
+  margin: 8px 0;
+}
+
 .modal-body-config-global_left {
     position: relative
 }
@@ -310,11 +327,11 @@ vertical-align: middle;
 
 .logo1 {
 	display: block;
-	margin: 5px;
+	margin: 0px;
 }
 
 .footer_float h5{
 	font-size: 12px;
 	font-weight: 600;
-	margin-top: 20px;
+	margin: 10px 0 5px 0;
 }

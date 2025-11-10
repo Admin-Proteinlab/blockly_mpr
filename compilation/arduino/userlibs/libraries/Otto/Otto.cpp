@@ -215,7 +215,7 @@ void Otto::home(){
   if(isOttoResting==false){ //Go to rest position only if necessary
 
     int homes[4]={90, 90, 90, 90}; //All the servos at rest position
-    _moveServos(500,homes);   //Move the servos in half a second
+    _moveServos(1000,homes);   //Move the servos in half a second
 
     detachServos();
     isOttoResting=true;
@@ -262,8 +262,8 @@ void Otto::walk(float steps, int T, int dir){
   //--      -90 : Walk forward
   //--       90 : Walk backward
   //-- Feet servos also have the same offset (for tiptoe a little bit)
-  int A[4]= {30, 30, 20, 20};
-  int O[4] = {0, 0, 4, -4};
+  int A[4]= {30, 30, 20, 20}; //30,30,20,20
+  int O[4] = {0, 0, 4, -4}; //0,0,5,-5
   double phase_diff[4] = {0, 0, DEG2RAD(dir * -90), DEG2RAD(dir * -90)};
 
   //-- Let's oscillate the servos!

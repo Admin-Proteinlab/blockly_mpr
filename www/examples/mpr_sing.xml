@@ -1,0 +1,52 @@
+<xml xmlns="http://www.w3.org/1999/xhtml">
+  <toolbox>toolbox_arduino_all</toolbox>
+  <block type="base_setup_loop" id="bbu,Ycm|oN%wsL77H?Kr" x="64" y="65">
+    <statement name="DO">
+      <block type="ultrasonic_sensor" id="c;V9_G%#-kam,2@:^G?W">
+        <field name="US_NUMBER">1</field>
+        <field name="PIN_TRIG">8</field>
+        <field name="PIN_ECHO">9</field>
+        <next>
+          <block type="buzzer_init" id="y`([hmAAywp[-nk2t/=v">
+            <field name="PIN">13</field>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <statement name="LOOP">
+      <block type="controls_if" id="2Qf+fB8/o:v@jUWubKiI">
+        <value name="IF0">
+          <block type="logic_compare" id="Xx3|w|USw:|{x*Z:LK35">
+            <field name="OP">LT</field>
+            <value name="A">
+              <block type="ultrasonic_distance" id="H`IMpuzxJ2eoLwRa!m/$">
+                <field name="US_NUMBER">1</field>
+              </block>
+            </value>
+            <value name="B">
+              <shadow type="math_number" id="g]Nj;[1a`ks?%`s![,K9">
+                <field name="NUM">10</field>
+              </shadow>
+            </value>
+          </block>
+        </value>
+        <statement name="DO0">
+          <block type="RTTTL_music" id="BCN/7!pdhO6[5TSdtwFw">
+            <field name="PIN_BUZZER">13</field>
+            <field name="MELODY">Short</field>
+          </block>
+        </statement>
+        <next>
+          <block type="base_delay" id="@%!yMuwJCH0H{6Q|j#s%">
+            <field name="unite">s</field>
+            <value name="DELAY_TIME">
+              <shadow type="math_number" id="U5tx!mWi:lo%TRUK:]L]">
+                <field name="NUM">1</field>
+              </shadow>
+            </value>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>

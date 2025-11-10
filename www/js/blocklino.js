@@ -66,7 +66,6 @@ BlocklyDuino.save_com = function() {
 	$("#portserie").blur();
 	var com=$("#portserie").val();
 	window.localStorage.com = com;
-	console.log("save_com ejecutado. Valor guardado:", com);
 };
 BlocklyDuino.renderArduinoCodePreview = function() {
 	var prog = window.localStorage.prog;
@@ -378,17 +377,17 @@ BlocklyDuino.bindFunctions = function() {
 		$("#toggle").toggle("slide");
 	}); */
 	$('#btn_verify').mouseover(function() {
-		document.getElementById("survol").textContent = "Check code";
+		document.getElementById("survol").textContent = "Verificando Código";
 	}).mouseout(function() {
 		document.getElementById("survol").textContent = "";
 	});
 	$('#btn_flash').mouseover(function() {
-		document.getElementById("survol").textContent = "Upload code";
+		document.getElementById("survol").textContent = "Cargar Código";
 	}).mouseout(function() {
 		document.getElementById("survol").textContent = "";
 	});
 	$('#btn_bin').mouseover(function() {
-		document.getElementById("survol").textContent = "Export as Binary .hex";
+		document.getElementById("survol").textContent = "Exportando como Binario .hex";
 	}).mouseout(function() {
 		document.getElementById("survol").textContent = "";
 	});
@@ -606,14 +605,21 @@ BlocklyDuino.buildExamples = function() {
 	    dataType: "json",
 	    success :  function(data) {
 			$("#includedContent").empty();
-			$.each(data, function(i, example){
+			$.each(data, function(i, example) {
 				if (example.visible) {
-					var line = "<tr><td>"
-							   + "<a href='?url=./examples/"+example.source_url+"'>" + example.source_text + "</a>"
-							  // + "</td><td>"
-							  // + "<a href='"+example.link_url+"' data-toggle='modal'>"
-							 //  + "<img class='vignette' src='./examples/"+example.image+"'></a>"
-							   + "</td></tr>";
+					let line = "<tr><td>";
+
+					// Si el objeto tiene una URL → crear enlace
+					if (example.source_url) {
+						line += "<a href='?url=./examples/" + example.source_url + "'>" 
+							 + example.source_text + "</a>";
+					} 
+					// Si solo tiene texto → insertar texto plano
+					else if (example.text) {
+						line += "<span class='example-text'>" + example.text + "</span>";
+					}
+
+					line += "</td></tr>";
 					$("#includedContent").append(line);
 				}
 			});

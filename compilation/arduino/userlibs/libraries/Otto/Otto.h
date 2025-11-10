@@ -16,7 +16,7 @@
 
 // ===== Otto Debug Config =====
 #ifndef OTTO_DBG
-  #define OTTO_DBG 1          // 1 = enable Serial debug, 0 = compiled out
+  #define OTTO_DBG 0          // 1 = enable Serial debug, 0 = compiled out
 #endif
 
 #ifndef OTTO_DBG_BAUD
@@ -62,9 +62,9 @@
 #define BACKWARD    -1
 #define LEFT        1
 #define RIGHT       -1
-#define SMALL       5
+#define SMALL       10
 #define MEDIUM      15
-#define BIG         30
+#define BIG         25
 
 // -- Servo delta limit default. degree / sec
 #define SERVO_LIMIT_DEFAULT 240
