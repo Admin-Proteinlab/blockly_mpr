@@ -37,7 +37,7 @@
     {"source_url": "humanoiddance.xml","source_text": "🦾 Humanoid dance ","visible": false},
     {"source_url": "humanoidsound.xml","source_text": "🦾 Humanoid react to sounds ","visible": false},
     {"source_url": "servoadvanced.xml","source_text": "🦿 Servo advanced control ","visible": false},
- 	  {"source_url": "touch.xml","source_text": "👇 Touch sensor interaction ","visible": false},
+ 	{"source_url": "touch.xml","source_text": "👇 Touch sensor interaction ","visible": false},
     {"source_url": "noise.xml","source_text": "👏 Sound sensor interaction ","visible": false},
     {"source_url": "serialnoise.xml","source_text": "👏 Serial sound sensor readings ","visible": false },
     {"source_url": "touchsoundtest.xml","source_text": "👇 Touch & 👏sound sensor test ","visible": false},
