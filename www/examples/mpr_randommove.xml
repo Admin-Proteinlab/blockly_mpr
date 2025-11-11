@@ -94,9 +94,9 @@
                       </block>
                     </value>
                     <statement name="DO0">
-                      <block type="otto_move" id="2!ReXbxtw7$s;}JJ@*Dg">
-                        <field name="otto_move_sens">FORWARD</field>
-                        <field name="otto_move_speed">2000</field>
+                      <block type="otto_move" id="T6_f;#,k#FSUj/s0a`L?">
+                        <field name="otto_move_sens">BENDLEFT</field>
+                        <field name="otto_move_speed">1500</field>
                       </block>
                     </statement>
                     <next>
@@ -141,8 +141,8 @@
                             </value>
                             <statement name="DO0">
                               <block type="otto_do" id="g693u]7e}+7s%m!.hya3">
-                                <field name="otto_do_movement">jitter</field>
-                                <field name="otto_move_speed">1500</field>
+                                <field name="otto_do_movement">swing</field>
+                                <field name="otto_move_speed">2000</field>
                                 <field name="otto_dance_size">25</field>
                               </block>
                             </statement>
@@ -171,7 +171,7 @@
                                 </statement>
                                 <next>
                                   <block type="otto_sound" id="CbNpgRtAUK4lm{H#k[,V">
-                                    <field name="otto_sound"> S_happy_short </field>
+                                    <field name="otto_sound">S_happy_short</field>
                                   </block>
                                 </next>
                               </block>
