@@ -64,15 +64,15 @@
                     </value>
                     <value name="B">
                       <shadow type="math_number" id="uP{lH%[8Y)${Lq_JEXGy">
-                        <field name="NUM">6</field>
+                        <field name="NUM">5</field>
                       </shadow>
                     </value>
                   </block>
                 </value>
                 <statement name="DO0">
-                  <block type="otto_move" id="+nG/no#|@TNHJ@rP4S0I">
-                    <field name="otto_move_sens">jump</field>
-                    <field name="otto_move_speed">2000</field>
+                  <block type="otto_move" id="AK{QssVj9vY0P+{y/W1#">
+                    <field name="otto_move_sens">BACKWARD</field>
+                    <field name="otto_move_speed">1500</field>
                   </block>
                 </statement>
                 <value name="IF1">
@@ -81,7 +81,7 @@
                     <field name="comp_sup">LT</field>
                     <value name="inf">
                       <block type="math_number" id="akIqBfX+kozW{%/(j2Q0">
-                        <field name="NUM">6</field>
+                        <field name="NUM">5</field>
                       </block>
                     </value>
                     <value name="valeur">
@@ -91,21 +91,22 @@
                     </value>
                     <value name="sup">
                       <block type="math_number" id="R=I7d8n$LYzfX+Ob#u2_">
-                        <field name="NUM">15</field>
+                        <field name="NUM">18</field>
                       </block>
                     </value>
                   </block>
                 </value>
                 <statement name="DO1">
-                  <block type="otto_move" id="AK{QssVj9vY0P+{y/W1#">
-                    <field name="otto_move_sens">BACKWARD</field>
-                    <field name="otto_move_speed">3500</field>
+                  <block type="otto_do" id="5a{y5k,|p#yA:U,%/@?X">
+                    <field name="otto_do_movement">updown</field>
+                    <field name="otto_move_speed">2000</field>
+                    <field name="otto_dance_size">25</field>
                   </block>
                 </statement>
                 <statement name="ELSE">
                   <block type="otto_move" id="U0VDv:5X~?c_Mbk%[qCO">
                     <field name="otto_move_sens">FORWARD</field>
-                    <field name="otto_move_speed">2000</field>
+                    <field name="otto_move_speed">3500</field>
                   </block>
                 </statement>
                 <next>
@@ -113,7 +114,7 @@
                     <field name="unite">m</field>
                     <value name="DELAY_TIME">
                       <shadow type="math_number" id="L/#do[IVF)vjRA91!e9:">
-                        <field name="NUM">250</field>
+                        <field name="NUM">50</field>
                       </shadow>
                     </value>
                   </block>
