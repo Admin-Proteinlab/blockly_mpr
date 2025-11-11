@@ -140,10 +140,10 @@
                               </block>
                             </value>
                             <statement name="DO0">
-                              <block type="otto_dance" id="w/%XlC)q3z[CG=g@Dg8g">
-                                <field name="otto_dance_movement">moonwalkerRIGHT</field>
-                                <field name="otto_move_speed">2000</field>
-                                <field name="otto_dance_size">40</field>
+                              <block type="otto_do" id="g693u]7e}+7s%m!.hya3">
+                                <field name="otto_do_movement">jitter</field>
+                                <field name="otto_move_speed">1500</field>
+                                <field name="otto_dance_size">25</field>
                               </block>
                             </statement>
                             <next>
@@ -171,7 +171,7 @@
                                 </statement>
                                 <next>
                                   <block type="otto_sound" id="CbNpgRtAUK4lm{H#k[,V">
-                                    <field name="otto_sound">S_superHappy</field>
+                                    <field name="otto_sound"> S_connection </field>
                                   </block>
                                 </next>
                               </block>
