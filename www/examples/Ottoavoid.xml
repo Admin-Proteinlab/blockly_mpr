@@ -47,7 +47,7 @@
                 <statement name="DO">
                   <block type="otto_move" id="-FZV(hp`@hn2IhOiXcSW">
                     <field name="otto_move_sens">BACKWARD</field>
-                    <field name="otto_move_speed">1000</field>
+                    <field name="otto_move_speed">2000</field>
                   </block>
                 </statement>
                 <next>
@@ -60,7 +60,7 @@
                     <statement name="DO">
                       <block type="otto_move" id="?)=*hV!.h_]NB`[5dAF0">
                         <field name="otto_move_sens">LEFT</field>
-                        <field name="otto_move_speed">1000</field>
+                        <field name="otto_move_speed">2000</field>
                       </block>
                     </statement>
                   </block>
@@ -72,7 +72,7 @@
         <next>
           <block type="otto_move" id="=hv@XBz7rNA%~He*OF22">
             <field name="otto_move_sens">FORWARD</field>
-            <field name="otto_move_speed">1000</field>
+            <field name="otto_move_speed">2000</field>
           </block>
         </next>
       </block>

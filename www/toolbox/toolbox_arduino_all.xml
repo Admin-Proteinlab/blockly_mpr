@@ -14,7 +14,7 @@
 	</category>
 
 	<category name="CAT_OTTO" colour="#4759F5">
-		<category name="CAT_OTTO_LEGS" colour="#4759F5">
+		<!--<category name="CAT_OTTO_LEGS" colour="#4759F5">-->
 			<block type="otto_configuration">
 				<field name="PIN_YL">2</field>
 				<field name="PIN_YR">3</field>
@@ -61,7 +61,8 @@
 				<value name="RF"><shadow type="math_number">	<field name="NUM">0</field>	</shadow></value>
 			</block>
 			<block type="otto_eeprom"></block>
-		</category>
+		<!--</category>
+		
 		<category name="CAT_OTTO_ARMS" colour="#4759F5">
 			<block type="otto_arms_init">
 				<field name="PIN_AL">6</field>
@@ -69,8 +70,9 @@
 			</block>
 			<block type="otto_arms_home"></block>
 			<block type="otto_arms"></block>
-		</category>
+		</category>-->
 
+<!--	
 		<category name="CAT_OTTO_WHEELS" colour="#4759F5">
 			<block type="servo_2wheels_init">
 			<field name="PINL">2</field>
@@ -124,7 +126,7 @@
 		<block type="otto_ninja_setroll"></block>
 		<block type="otto_ninja_walkstop"></block>
 		<block type="otto_ninja_rollstop"></block>
-		</category>
+		</category> 
 <category name="CAT_OTTO_QUAD" colour="#4759F5">
 				<block type="otto_quad_configuration">
 			<field name="FRH">2</field>
@@ -162,7 +164,7 @@
 			<block type="escornabot_whiteLeft"></block>
 			<block type="escornabot_whiteRight"></block>
 			<block type="escornabot_app"></block>
-	</category>
+	</category> -->
 
 	</category>
 	<category name="CAT_servo" colour="#4759F5">
@@ -392,7 +394,7 @@
 			<block type="VL53L0X"></block>
 			<block type="VL53L0X_distance"></block>
 		</category>
-
+		
 		<category name="CAT_SOUND" colour="#54BCF7">
 				<block type="Sound_status_sensor2"></block>
 				<block type="Sound_sensor2"></block>
@@ -541,7 +543,7 @@
 		<block type="led_digital"></block>
 		<block type="led_pwm"><value name="STAT"><shadow type="math_number"><field name="NUM">128</field></shadow></value></block>
 </category>
-		<category name="CAT_ARDUINO_matrice8x8" colour="#B655F5">
+		<!--<category name="CAT_ARDUINO_matrice8x8" colour="#B655F5">
 				<block type="mouth_init">
 						<field name="PIN_CLK">A1</field>
        					<field name="PIN_CS">A2</field>
@@ -637,8 +639,8 @@
 		   		<field name="PIN_SDA">A5</field>
 			</block>
 		</category>
-		<!--<category name="CAT_MAX1640" colour="#B655F5">
-		</category> -->
+		<category name="CAT_MAX1640" colour="#B655F5">
+		</category>
 	<category name="CAT_LEDRGB" colour="#B655F5">
 		<block type="rgb_init">
 			<field name="rouge">9</field>
@@ -880,7 +882,9 @@
                 <block type="lcdi2c_scrollDisplay"></block>
 				<block type="lcdi2c_showCursor"></block>
 				<block type="lcdi2c_blinkCursor"></block>
-		</category>
+		</category>-->
+
+		
 		<category name="CAT_BARGRAPH" colour="#B655F5">
 			<block type="bargraphe">
 			<field name="clk">A2</field>
@@ -890,7 +894,7 @@
 			<value name="del"><shadow type="math_number"><field name="NUM">10</field></shadow></value>
 			</block>
 		</category>
-	</category>
+	</category> 
 
 <category name="CAT_AUDIO" colour="#FF63BB">
 		<category name="CAT_BUZZER" colour="#FF63BB">

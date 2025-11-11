@@ -72,12 +72,12 @@
                 <statement name="DO0">
                   <block type="otto_dance" id="2J|yb):a(zsqGNh$!Y5#">
                     <field name="otto_dance_movement">moonwalkerLEFT</field>
-                    <field name="otto_move_speed">1000</field>
+                    <field name="otto_move_speed">2000</field>
                     <field name="otto_dance_size">25</field>
                     <next>
                       <block type="otto_dance" id="q5.X?q?Bl8P[,8i*~|@s">
                         <field name="otto_dance_movement">moonwalkerRIGHT</field>
-                        <field name="otto_move_speed">1000</field>
+                        <field name="otto_move_speed">2000</field>
                         <field name="otto_dance_size">25</field>
                       </block>
                     </next>
@@ -103,12 +103,12 @@
                     <statement name="DO0">
                       <block type="otto_dance" id="w/%XlC)q3z[CG=g@Dg8g">
                         <field name="otto_dance_movement">crusaitoLEFT</field>
-                        <field name="otto_move_speed">1000</field>
+                        <field name="otto_move_speed">2000</field>
                         <field name="otto_dance_size">25</field>
                         <next>
                           <block type="otto_dance" id="$#n`xZ!Yj=MlMz6/?uDW">
                             <field name="otto_dance_movement">crusaitoRIGHT</field>
-                            <field name="otto_move_speed">1000</field>
+                            <field name="otto_move_speed">2000</field>
                             <field name="otto_dance_size">25</field>
                           </block>
                         </next>
@@ -134,12 +134,12 @@
                         <statement name="DO0">
                           <block type="otto_dance" id="3fcli=N4$11itbQaw)W8">
                             <field name="otto_dance_movement">flappingFRONT</field>
-                            <field name="otto_move_speed">1000</field>
+                            <field name="otto_move_speed">2000</field>
                             <field name="otto_dance_size">25</field>
                             <next>
                               <block type="otto_dance" id="FT6qgVef*@r{L/}4IOZz">
                                 <field name="otto_dance_movement">flappingBACK</field>
-                                <field name="otto_move_speed">1000</field>
+                                <field name="otto_move_speed">2000</field>
                                 <field name="otto_dance_size">25</field>
                               </block>
                             </next>
@@ -165,7 +165,7 @@
                             <statement name="DO0">
                               <block type="otto_do" id="nxr/!RA~6JBWfx[zI4x(">
                                 <field name="otto_do_movement">swing</field>
-                                <field name="otto_move_speed">1000</field>
+                                <field name="otto_move_speed">2000</field>
                                 <field name="otto_dance_size">25</field>
                               </block>
                             </statement>
@@ -189,7 +189,7 @@
                                 <statement name="DO0">
                                   <block type="otto_do" id="@c-BdXc]Q%.5ps?j+Z0O">
                                     <field name="otto_do_movement">updown</field>
-                                    <field name="otto_move_speed">1000</field>
+                                    <field name="otto_move_speed">2000</field>
                                     <field name="otto_dance_size">25</field>
                                   </block>
                                 </statement>
@@ -213,7 +213,7 @@
                                     <statement name="DO0">
                                       <block type="otto_do" id="SY#ULNNjTX:cfZM6duOL">
                                         <field name="otto_do_movement">tiptoeSwing</field>
-                                        <field name="otto_move_speed">1000</field>
+                                        <field name="otto_move_speed">2000</field>
                                         <field name="otto_dance_size">25</field>
                                       </block>
                                     </statement>
@@ -237,7 +237,7 @@
                                         <statement name="DO0">
                                           <block type="otto_do" id="eJ!0P[;zJ1e!ba38;Y2J">
                                             <field name="otto_do_movement">ascendingTurn</field>
-                                            <field name="otto_move_speed">1000</field>
+                                            <field name="otto_move_speed">2000</field>
                                             <field name="otto_dance_size">25</field>
                                           </block>
                                         </statement>
@@ -261,7 +261,7 @@
                                             <statement name="DO0">
                                               <block type="otto_move" id="9M~)?5i-piW4y.Du4tfF">
                                                 <field name="otto_move_sens">BENDLEFT</field>
-                                                <field name="otto_move_speed">1000</field>
+                                                <field name="otto_move_speed">2000</field>
                                               </block>
                                             </statement>
                                             <next>
@@ -284,7 +284,7 @@
                                                 <statement name="DO0">
                                                   <block type="otto_move" id="HMl=o/+M;Z4?}NqTluH7">
                                                     <field name="otto_move_sens">BENDRIGHT</field>
-                                                    <field name="otto_move_speed">1000</field>
+                                                    <field name="otto_move_speed">2000</field>
                                                   </block>
                                                 </statement>
                                                 <next>
@@ -307,7 +307,7 @@
                                                     <statement name="DO0">
                                                       <block type="otto_do" id="(qjoT3*.#z.}Q3XIDO7T">
                                                         <field name="otto_do_movement">jitter</field>
-                                                        <field name="otto_move_speed">1000</field>
+                                                        <field name="otto_move_speed">2000</field>
                                                         <field name="otto_dance_size">25</field>
                                                       </block>
                                                     </statement>
@@ -331,7 +331,7 @@
                                                         <statement name="DO0">
                                                           <block type="otto_move" id="G.Ki^^eO2Ldu(yheHFP=">
                                                             <field name="otto_move_sens">jump</field>
-                                                            <field name="otto_move_speed">1000</field>
+                                                            <field name="otto_move_speed">2000</field>
                                                           </block>
                                                         </statement>
                                                         <next>
@@ -354,7 +354,7 @@
                                                             <statement name="DO0">
                                                               <block type="otto_move" id="6{U3y#yc^%ew}UCAXXo}">
                                                                 <field name="otto_move_sens">SHAKELEFT</field>
-                                                                <field name="otto_move_speed">1000</field>
+                                                                <field name="otto_move_speed">2000</field>
                                                               </block>
                                                             </statement>
                                                             <next>
@@ -377,7 +377,7 @@
                                                                 <statement name="DO0">
                                                                   <block type="otto_move" id="CZZ{nNGRyfxv#T%-Xq||">
                                                                     <field name="otto_move_sens">SHAKERIGHT</field>
-                                                                    <field name="otto_move_speed">1000</field>
+                                                                    <field name="otto_move_speed">2000</field>
                                                                   </block>
                                                                 </statement>
                                                                 <next>
@@ -400,7 +400,7 @@
                                                                     <statement name="DO0">
                                                                       <block type="otto_move" id="~xPNjQ-VROyE`x,7,|BA">
                                                                         <field name="otto_move_sens">FORWARD</field>
-                                                                        <field name="otto_move_speed">1000</field>
+                                                                        <field name="otto_move_speed">2000</field>
                                                                       </block>
                                                                     </statement>
                                                                     <next>
@@ -423,7 +423,7 @@
                                                                         <statement name="DO0">
                                                                           <block type="otto_move" id="=uD@u:T#h0Vz#~o,z[`L">
                                                                             <field name="otto_move_sens">BACKWARD</field>
-                                                                            <field name="otto_move_speed">1000</field>
+                                                                            <field name="otto_move_speed">2000</field>
                                                                           </block>
                                                                         </statement>
                                                                       </block>
