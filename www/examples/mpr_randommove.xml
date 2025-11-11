@@ -142,7 +142,7 @@
                             <statement name="DO0">
                               <block type="otto_dance" id="w/%XlC)q3z[CG=g@Dg8g">
                                 <field name="otto_dance_movement">moonwalkerRIGHT</field>
-                                <field name="otto_move_speed">750</field>
+                                <field name="otto_move_speed">2000</field>
                                 <field name="otto_dance_size">40</field>
                               </block>
                             </statement>
@@ -166,7 +166,7 @@
                                 <statement name="DO0">
                                   <block type="otto_move" id="q3?+:41n/zDs*_=EmxX1">
                                     <field name="otto_move_sens">jump</field>
-                                    <field name="otto_move_speed">750</field>
+                                    <field name="otto_move_speed">2000</field>
                                   </block>
                                 </statement>
                                 <next>
